@@ -25,7 +25,7 @@ endif()
 
 
 install(
-  DIRECTORY config description launch worlds
+  DIRECTORY config description launch worlds meshes
   DESTINATION share/${PROJECT_NAME}
 )
 

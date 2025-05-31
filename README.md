@@ -1,4 +1,5 @@
 - [Required Installations](#required-installations)
+- [Create Package](#create-package)
 - [Important ROS2 Commands](#important-ros2-commands)
 
 
@@ -23,6 +24,8 @@ install xacro package
 sudo apt install ros-humble-xacro
 ```
 
+
+# Create Package
 Now create ROS2 package using 
 ```
 ros2 pkg create --build-type ament_cmake --license Apache-2.0 emma_visualization
@@ -33,6 +36,21 @@ And then add directories description launch and meshes
 Add your urdf.xacro files in description.
 
 > **_NOTE:_**  Load rviz2 using ```ros2 run rviz2 rviz2``` after sourcing terminal properly 
+
+Create a launch file and include robot state publisher as this node provide topics like /tf /tf_static and /robot_description however provide a path of a xacro file from description directory to robto_state_publisher as a paramter
+
+```
+cd schaeffler_ws && colcon build --symlink-install 
+source install/setup.bash
+ros2 launch emma_visualization rsp.launch.py
+```
+
+Then run rviz2 ```ros2 run rviz2 rviz2```
+
+Provide joint states as robot wheels are expecting some join values
+```
+ros2 run joint_state_publisher_gui joint_state_publisher_gui
+```
 
 
 

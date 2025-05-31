@@ -11,3 +11,13 @@ Install join state piblisher
 ```bash
 sudo apt install ros-humble-joint-state-publisher
 ```
+
+install joint install publisher gui
+```bash
+sudo apt install ros-humble-joint-state-publisher-gui
+```
+
+install xacro package
+```
+sudo apt install ros-humble-xacro
+```

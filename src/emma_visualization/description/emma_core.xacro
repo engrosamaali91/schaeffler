@@ -14,19 +14,11 @@
         <color rgba="1 1 1 1"/>
     </material>
 
-
+    <!-- Base Link-->
     <link name="base_link">
     </link>
 
-    <!-- <link name="chassis">
-        <visual>
-            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
-            <geometry>
-                <box size="0.4 0.2 0.5"/>
-            </geometry>
-        </visual>
-    </link> -->
-
+    <!-- Chassis Link or Main Body-->
     <link name="chassis">
         <visual>
             <origin rpy="1.5707963267949 0 1.5707963267949" xyz="0 0 0"/>
@@ -45,21 +37,117 @@
         <inertial>
             <mass value="4.07"/>
             <inertia ixx="0.426" ixy="0.0" ixz="0.0" iyy="0.496" iyz="0.0" izz="0.91"/>
-            </inertial>
+        </inertial>
     </link>
 
+
+    <!-- Chassis Joint-->
     <joint name="chassis_joint" type="fixed">
 
         <parent link="base_link"/>
         <child link="chassis"/>
-        <origin xyz="0.0 0.0 0.1"/>
+        <origin xyz="0.0 0.0 0.085"/>
         
+    </joint>
+
+
+    <link name="left_wheel">
+        <visual>
+        <origin xyz="0 0 0" rpy="1.5707963267949 0 0" />
+        <geometry>
+            <cylinder radius="0.088" length="0.03937"/>
+        </geometry>
+        <material name="black"/>
+        </visual>
+
+        <collision>
+        <origin xyz="0 0 0" rpy="1.5707963267949 0 0"/>
+        <geometry>
+            <cylinder radius="0.088" length="0.03937"/>
+        </geometry>
+        </collision>
+        
+        <inertial>
+        <mass value="0.17"/>
+        <inertia ixx="0.000204" ixy="0.0" ixz="0.0" iyy="0.000306" iyz="0.0" izz="0.000204"/>
+        </inertial>
+    </link>
+    <joint name="left_wheel_joint" type="continuous">
+            <parent link="chassis"/>
+            <child link="left_wheel"/>
+            <origin xyz="0 0.196425 0.000881" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+    </joint>
+
+
+    <link name="right_wheel">
+        <visual>
+        <origin xyz="0 0 0" rpy="1.5707963267949 0 0" />
+        <geometry>
+            <cylinder radius="0.088" length="0.03937"/>
+        </geometry>
+        <material name="black"/>
+        </visual>
+
+        <collision>
+        <origin xyz="0 0 0" rpy="1.5707963267949 0 0"/>
+        <geometry>
+            <cylinder radius="0.088" length="0.03937"/>
+        </geometry>
+        </collision>
+        
+        <inertial>
+        <mass value="0.17"/>
+        <inertia ixx="0.000204" ixy="0.0" ixz="0.0" iyy="0.000306" iyz="0.0" izz="0.000204"/>
+        </inertial>
+    </link>
+    <joint name="right_wheel_joint" type="continuous">
+            <parent link="chassis"/>
+            <child link="right_wheel"/>
+            <origin xyz="0 -0.196425 0.000881" rpy="0 0 0"/>
+            <axis xyz="0 1 0"/>
+    </joint>
+
+
+
+ 
+
+    <!-- <link name="left_wheel">
+    <visual>
+        <geometry>
+            <cylinder radius="0.088" length="0.03937"/>
+        </geometry>
+        <material name="blue"/>
+    </visual>
+    </link>
+
+
+    <joint name="left_wheel_joint" type="continuous">
+        <parent link="chassis"/>
+        <child link="left_wheel"/>
+        <origin xyz="0.0 0.6 0.0" rpy="-${pi/2} 0 0"/>
+        <axis xyz="0.0 0.0 1.0"/>
     </joint>
 
 
 
 
+    <link name="right_wheel">
+    <visual>
+        <geometry>
+            <cylinder radius="0.05" length="0.04"/>
+        </geometry>
+        <material name="blue"/>
+    </visual>
+    </link>
 
+
+    <joint name="right_wheel_joint" type="continuous">
+        <parent link="base_link"/>
+        <child link="right_wheel"/>
+        <origin xyz="0.0 -0.6 0.0" rpy="${pi/2} 0 0"/>
+        <axis xyz="0.0 0.0 -1.0"/>
+    </joint> -->
 
 
 

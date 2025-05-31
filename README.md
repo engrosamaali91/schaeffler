@@ -23,6 +23,18 @@ install xacro package
 sudo apt install ros-humble-xacro
 ```
 
+Now create ROS2 package using 
+```
+ros2 pkg create --build-type ament_cmake --license Apache-2.0 emma_visualization
+```
+
+And then add directories description launch and meshes
+
+Add your urdf.xacro files in description.
+
+> **_NOTE:_**  Load rviz2 using ```ros2 run rviz2 rviz2``` after sourcing terminal properly 
+
+
 
 # Important ROS2 Commands
 ``` 

@@ -132,7 +132,7 @@
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="right_front_small_wheel"/>
-        <origin rpy="3.1415926535897 0 0" xyz="0.209 -0.108 -0.049"/>
+        <origin xyz="0.209 -0.108 -0.049" rpy="3.1415926535897 0 0"/>
     </joint>
 
 
@@ -159,7 +159,7 @@
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="left_front_small_wheel"/>
-        <origin rpy="3.1415926535897 0 0" xyz="0.209 0.108 -0.049"/>
+        <origin  xyz="0.209 0.108 -0.049" rpy="3.1415926535897 0 0"/>
     </joint>
 
  

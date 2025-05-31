@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" >
+
+
+    
+    <material name="blue">
+        <color rgba="0 0 0.8 1"/>
+    </material>
+    <material name="black">
+        <color rgba="0 0 0 1"/>
+    </material>
+    <material name="white">
+        <color rgba="1 1 1 1"/>
+    </material>
+
+
+
+    <link name="base_link">
+        
+    </link>
+
+    <!-- <link name="chassis">
+        <visual>
+            <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0"/>
+            <geometry>
+                <box size="0.4 0.2 0.5"/>
+            </geometry>
+        </visual>
+    </link> -->
+
+    <link name="chassis">
+        <visual>
+            <origin rpy="1.5707963267949 0 1.5707963267949" xyz="0 0 0"/>
+            <geometry>
+                <!-- <mesh filename="package://amr_visualisation/meshes/AMR_Platform.STL"/> -->
+                <box size="0.4 0.2 0.5"/>
+            </geometry>
+            <material name="white"/>
+        </visual>
+        <collision>
+            <origin rpy="1.5707963267949 0 1.5707963267949" xyz="0 0 0"/>
+            <geometry>
+                <!-- <mesh filename="package://amr_visualisation/meshes/AMR_Platform.STL"/> -->
+                <box size="0.4 0.2 0.5"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <mass value="4.07"/>
+            <inertia ixx="0.426" ixy="0.0" ixz="0.0" iyy="0.496" iyz="0.0" izz="0.91"/>
+            </inertial>
+    </link>
+
+    <joint name="chassis_joint" type="fixed">
+
+        <parent link="base_link"/>
+        <child link="chassis"/>
+        <origin xyz="0.0 0.0 0.1"/>
+        
+    </joint>
+
+
+
+
+
+
+
+
+</robot>

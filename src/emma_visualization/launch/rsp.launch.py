@@ -29,6 +29,14 @@ def generate_launch_description():
         output='screen',
         parameters=[params]
     )
+    rviz_config_file = os.path.join(pkg_path, 'config', 'emma_view.rviz')
+    rviz_node = Node(
+        package='rviz2',
+        executable='rviz2',
+        output='screen',
+        arguments=['-d', rviz_config_file],
+        parameters=[{'use_sim_time': use_sim_time}]
+    )
 
 
     # Launch!
@@ -38,5 +46,6 @@ def generate_launch_description():
             default_value='false',
             description='Use sim time if true'),
 
-        node_robot_state_publisher
+        node_robot_state_publisher,
+        rviz_node
     ])

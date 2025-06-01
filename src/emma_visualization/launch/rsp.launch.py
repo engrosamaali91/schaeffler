@@ -22,21 +22,11 @@ def generate_launch_description():
     
     # Create a robot_state_publisher node
     params = {'robot_description': robot_description_config.toxml(), 'use_sim_time': use_sim_time}
-
     node_robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         output='screen',
         parameters=[params]
-    )
-    # Create rviz2 node and load saved rviz configuration 
-    rviz_config_file = os.path.join(pkg_path, 'config', 'emma_view.rviz')
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        output='screen',
-        arguments=['-d', rviz_config_file],
-        
     )
 
 
@@ -44,9 +34,8 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
-            default_value='true',
+            default_value='false',
             description='Use sim time if true'),
 
-        node_robot_state_publisher,
-        rviz_node
+        node_robot_state_publisher
     ])

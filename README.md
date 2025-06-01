@@ -52,7 +52,15 @@ Provide joint states as robot wheels are expecting some join values
 ros2 run joint_state_publisher_gui joint_state_publisher_gui
 ```
 
+In Rviz2 change frame_id from world to base_link becuase the root of the robot is set as base_link
+add TF and robot_model and check if transform tree looks correct.
 
+![Robot frames](src/media/frames.png)
+
+Ensure the robot wheels are perfectly aligned with z axis upward of allsix wheels 
+
+
+![Robot model](src/media/Wheels.png)
 
 # Important ROS2 Commands
 ``` 

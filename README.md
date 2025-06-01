@@ -1,5 +1,6 @@
 - [Required Installations](#required-installations)
 - [Create Package](#create-package)
+- [Gazebo](#gazebo)
 - [Important ROS2 Commands](#important-ros2-commands)
 
 
@@ -61,6 +62,21 @@ Ensure the robot wheels are perfectly aligned with z axis upward of allsix wheel
 
 
 ![Robot model](src/media/Wheels.png)
+
+
+# Gazebo
+Now that we have written robot state publisher node and we can visualize robot in rivz now is the time to run the robot in gazebo and spawn the robot in gazebo. 
+
+> **_NOTE:_** Ensure to launch robot state publisher with use_sim_time:= true becuase we gonna be running it on gazebo time 
+
+Launch gazebo and see if it is loading 
+```
+ros2 launch gazebo_ros gazebo.launch.py
+```
+
+
+
+
 
 # Important ROS2 Commands
 ``` 

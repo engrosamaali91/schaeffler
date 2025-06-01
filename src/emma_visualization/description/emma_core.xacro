@@ -23,15 +23,14 @@
         <visual>
             <origin rpy="1.5707963267949 0 1.5707963267949" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://emma_visualization/meshes/emma_cover.stl"/>
+                <mesh filename="file:///home/osama/schaeffler/src/emma_visualization/meshes/AMR_Platform.STL"/>
             </geometry>
             <material name="white"/>
         </visual>
         <collision>
             <origin rpy="1.5707963267949 0 1.5707963267949" xyz="0 0 0"/>
             <geometry>
-                <mesh filename="package://emma_visualization/meshes/emma_cover.stl"/>
-
+                <mesh filename="file:///home/osama/schaeffler/src/emma_visualization/meshes/AMR_Platform.STL"/>
             </geometry>
         </collision>
         <inertial>
@@ -39,6 +38,8 @@
             <inertia ixx="0.426" ixy="0.0" ixz="0.0" iyy="0.496" iyz="0.0" izz="0.91"/>
         </inertial>
     </link>
+
+
 
 
     <!-- Chassis Joint-->
@@ -78,7 +79,9 @@
             <origin xyz="0 0.196425 0.000881" rpy="0 0 0"/>
             <axis xyz="0 1 0"/>
     </joint>
-
+    <gazebo reference="chassis">
+        <material>Gazebo/black</material>
+    </gazebo>
 
     <link name="right_wheel">
         <visual>
@@ -107,7 +110,9 @@
             <origin xyz="0 -0.196425 0.000881" rpy="0 0 0"/>
             <axis xyz="0 1 0"/>
     </joint>
-
+    <gazebo reference="chassis">
+        <material>Gazebo/black</material>
+    </gazebo>
 
     <link name="right_front_small_wheel">
         <visual>
@@ -134,7 +139,9 @@
         <child link="right_front_small_wheel"/>
         <origin xyz="0.209 -0.108 -0.049" rpy="0 0 0"/>
     </joint>
-
+    <gazebo reference="chassis">
+        <material>Gazebo/black</material>
+    </gazebo>
 
     <link name="left_front_small_wheel">
         <visual>
@@ -161,7 +168,9 @@
         <child link="left_front_small_wheel"/>
         <origin  xyz="0.209 0.108 -0.049" rpy="0 0 0"/>
     </joint>
-
+    <gazebo reference="chassis">
+        <material>Gazebo/black</material>
+    </gazebo>
 
     <link name="left_back_small_wheel">
         <visual>
@@ -188,7 +197,9 @@
         <child link="left_back_small_wheel"/>
         <origin xyz="-0.228 0.156 -0.049" rpy="0 0 0" />
     </joint>
- 
+     <gazebo reference="chassis">
+        <material>Gazebo/black</material>
+    </gazebo>
 
 
     <link name="right_back_small_wheel">
@@ -216,7 +227,9 @@
         <child link="right_back_small_wheel"/>
         <origin xyz="-0.228 -0.156 -0.049" rpy="0 0 0" />
     </joint>
-
+    <gazebo reference="chassis">
+        <material>Gazebo/black</material>
+    </gazebo>
     <!-- <link name="left_wheel">
     <visual>
         <geometry>

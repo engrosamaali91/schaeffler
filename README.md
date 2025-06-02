@@ -75,6 +75,36 @@ ros2 launch gazebo_ros gazebo.launch.py
 ```
 
 
+# Launch rsp, spawn robot and gazebo launch file together 
+```
+ros2 launch emma_visualization launch_sim.launch.py 
+```
+
+Move robot with teleop twist keyboard this will publish command velocities on cmd_vel topic 
+```
+ros2 run teleop_twist_keyboard teleop_twist_keyboard
+```
+
+If you want create a world in gazebo and save the world in worlds directory after deleting robot
+
+Load the gazebo world 
+
+```
+ros2 launch emma_visualization launch_sim.launch.py world:=./src/emma_visualization/worlds/powerplant.world
+```
+
+This would load the gazebo world with a robot at origin 
+
+> **Note:** I have kept the supporting wheel fixed as this is a diff drive robot but in case due to large friction i should add mu values as zero in corresponding gazebo tags
+
+
+```
+    <gazebo reference="caster_wheel">
+        <material>Gazebo/Black</material>
+        <mu1 value="0.001"/>
+        <mu2 value="0.001"/>
+    </gazebo>
+```
 
 
 

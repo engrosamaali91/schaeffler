@@ -26,9 +26,11 @@
 
         <geometry>
         <!-- <box size="0.4 0.3 0.1"/> -->
-         <mesh filename="file:///home/osama/schaeffler/src/emma_visualization/meshes/AMR_Platform.STL"/>
+         <mesh filename="file:///home/schaeffler/schaeffler/src/emma_visualization/meshes/AMR_Platform.STL"/>
+         
         </geometry>
-        <material name="Gazebo/Red"/>
+        <material name="white"/>
+
     </visual>
 
     <collision>
@@ -79,6 +81,9 @@
         <origin xyz="0.0 0.0 0.085"/>
         
     </joint>
+    <gazebo reference="chassis">
+        <material>Gazebo/white</material>
+    </gazebo>
 
 
     <link name="left_wheel">

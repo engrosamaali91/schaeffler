@@ -174,7 +174,7 @@
         <material>Gazebo/black</material>
     </gazebo>
 
-    <joint name="right_front_small_wheel_joint" type="continuous">
+    <joint name="right_front_small_wheel_joint" type="fixed">
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="right_front_small_wheel"/>
@@ -204,7 +204,7 @@
         <material>Gazebo/black</material>
     </gazebo>
 
-    <joint name="left_front_small_wheel_joint" type="continuous">
+    <joint name="left_front_small_wheel_joint" type="fixed">
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="left_front_small_wheel"/>
@@ -234,7 +234,7 @@
         <material>Gazebo/black</material>
     </gazebo>
 
-    <joint name="left_back_small_wheel_joint" type="continuous">
+    <joint name="left_back_small_wheel_joint" type="fixed">
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="left_back_small_wheel"/>
@@ -264,7 +264,7 @@
     <gazebo reference="right_back_small_wheel">
         <material>Gazebo/black</material>
     </gazebo>
-    <joint name="right_back_small_wheel_joint" type="continuous">
+    <joint name="right_back_small_wheel_joint" type="fixed">
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="right_back_small_wheel"/>

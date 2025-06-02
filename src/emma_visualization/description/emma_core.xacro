@@ -45,7 +45,9 @@
         <inertia ixx="0.426" ixy="0.0" ixz="0.0" iyy="0.496" iyz="0.0" izz="0.91"/>
     </inertial>
     </link>
-
+    <gazebo reference="chassis">
+        <material>Gazebo/white</material>
+    </gazebo>
     <!-- Chassis Joint-->
     <joint name="chassis_joint" type="fixed">
 
@@ -55,9 +57,7 @@
         
     </joint>
 
-    <gazebo reference="chassis">
-        <material>Gazebo/white</material>
-    </gazebo>
+
 
     <!-- Chassis Link or Main Body-->
     <!-- <link name="chassis">
@@ -108,15 +108,16 @@
             <inertia ixx="0.000204" ixy="0.0" ixz="0.0" iyy="0.000306" iyz="0.0" izz="0.000204"/>
         </inertial>
     </link>
+    <gazebo reference="left_wheel">
+        <material>Gazebo/black</material>
+    </gazebo>
     <joint name="left_wheel_joint" type="continuous">
             <parent link="chassis"/>
             <child link="left_wheel"/>
             <origin xyz="0 0.196425 0.000881" rpy="0 0 0"/>
             <axis xyz="0 1 0"/>
     </joint>
-    <gazebo reference="left_wheel">
-        <material>Gazebo/black</material>
-    </gazebo>
+
 
     <link name="right_wheel">
         <visual>
@@ -139,15 +140,16 @@
             <inertia ixx="0.000204" ixy="0.0" ixz="0.0" iyy="0.000306" iyz="0.0" izz="0.000204"/>
         </inertial>
     </link>
+    <gazebo reference="right_wheel">
+        <material>Gazebo/black</material>
+    </gazebo>
     <joint name="right_wheel_joint" type="continuous">
             <parent link="chassis"/>
             <child link="right_wheel"/>
             <origin xyz="0 -0.196425 0.000881" rpy="0 0 0"/>
             <axis xyz="0 1 0"/>
     </joint>
-    <gazebo reference="right_wheel">
-        <material>Gazebo/black</material>
-    </gazebo>
+
 
     <link name="right_front_small_wheel">
         <visual>
@@ -168,15 +170,16 @@
             <inertia ixx="0.000204" ixy="0.0" ixz="0.0" iyy="0.000306" iyz="0.0" izz="0.000204"/>
         </inertial>
     </link>
+    <gazebo reference="right_front_small_wheel">
+        <material>Gazebo/black</material>
+    </gazebo>
+
     <joint name="right_front_small_wheel_joint" type="continuous">
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="right_front_small_wheel"/>
         <origin xyz="0.209 -0.108 -0.049" rpy="0 0 0"/>
     </joint>
-    <gazebo reference="right_front_small_wheel">
-        <material>Gazebo/black</material>
-    </gazebo>
 
     <link name="left_front_small_wheel">
         <visual>
@@ -197,15 +200,16 @@
             <inertia ixx="0.000204" ixy="0.0" ixz="0.0" iyy="0.000306" iyz="0.0" izz="0.000204"/>
         </inertial>
     </link>
+    <gazebo reference="left_front_small_wheel">
+        <material>Gazebo/black</material>
+    </gazebo>
+
     <joint name="left_front_small_wheel_joint" type="continuous">
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="left_front_small_wheel"/>
         <origin  xyz="0.209 0.108 -0.049" rpy="0 0 0"/>
     </joint>
-    <gazebo reference="left_front_small_wheel">
-        <material>Gazebo/black</material>
-    </gazebo>
 
     <link name="left_back_small_wheel">
         <visual>
@@ -226,15 +230,16 @@
             <inertia ixx="0.000204" ixy="0.0" ixz="0.0" iyy="0.000306" iyz="0.0" izz="0.000204"/>
         </inertial>
     </link>
+     <gazebo reference="left_back_small_wheel">
+        <material>Gazebo/black</material>
+    </gazebo>
+
     <joint name="left_back_small_wheel_joint" type="continuous">
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="left_back_small_wheel"/>
         <origin xyz="-0.228 0.156 -0.049" rpy="0 0 0" />
     </joint>
-     <gazebo reference="left_back_small_wheel">
-        <material>Gazebo/black</material>
-    </gazebo>
 
 
     <link name="right_back_small_wheel">
@@ -256,15 +261,16 @@
             <inertia ixx="0.000204" ixy="0.0" ixz="0.0" iyy="0.000306" iyz="0.0" izz="0.000204"/>
         </inertial>
     </link>
+    <gazebo reference="right_back_small_wheel">
+        <material>Gazebo/black</material>
+    </gazebo>
     <joint name="right_back_small_wheel_joint" type="continuous">
         <axis rpy="0 0 0" xyz="0 1 0"/>
         <parent link="chassis"/>
         <child link="right_back_small_wheel"/>
         <origin xyz="-0.228 -0.156 -0.049" rpy="0 0 0" />
     </joint>
-    <gazebo reference="right_back_small_wheel">
-        <material>Gazebo/black</material>
-    </gazebo>
+
 
 
 </robot>

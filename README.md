@@ -1,6 +1,9 @@
 - [Required Installations](#required-installations)
 - [Create Package](#create-package)
 - [Gazebo](#gazebo)
+- [Launch rsp, spawn robot and gazebo launch file together](#launch-rsp-spawn-robot-and-gazebo-launch-file-together)
+- [Gazebo Lidar](#gazebo-lidar)
+- [Gazebo camera](#gazebo-camera)
 - [Important ROS2 Commands](#important-ros2-commands)
 
 
@@ -106,6 +109,22 @@ This would load the gazebo world with a robot at origin
     </gazebo>
 ```
 
+
+# Gazebo Lidar
+...
+ 
+# Gazebo camera
+
+install following packages for rendering compressed images in rviz 
+```
+sudo apt install ros-humble-image-transport-plugins 
+sudo apt install ros-humble-rqt-image-view
+```
+
+You can later visualize compressed images in rqt-image view because for some reason rviz2 does not render compressed images 
+```
+ros2 run rqt_image_view rqt_image_view 
+```
 
 
 # Important ROS2 Commands

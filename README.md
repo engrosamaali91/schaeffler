@@ -125,6 +125,45 @@ You can later visualize compressed images in rqt-image view because for some rea
 ```
 ros2 run rqt_image_view rqt_image_view 
 ```
+# Ros2 control
+
+Later i will make a seperate branch and integrate ros2 control as this is for real robot control. 
+Beacuase i dont want to rely on gazebo plugin. 
+https://articulatedrobotics.xyz/tutorials/mobile-robot/applications/ros2_control-concepts/
+
+
+
+# SLAM with ROS using slam_toolbox
+
+
+add basefoot print link as a parent of baselink for SLAM 
+baseline -> basefootprint 
+
+
+then install slam toolbox if it is not already installed on the system
+
+```
+sudo apt install ros-humble-slam-toolbox
+```
+
+
+now copy the paramter file for slam toolbox 
+
+```
+cp /opt/ros/humble/share/slam_toolbox/config/mapper_params_online_async.yaml /home/schaeffler/schaeffler/src/emma_visualization/config/
+```
+This is provide the ```map``` frame id as can be noticed in mapper_params_online_async.yaml file in config directory.
+
+run gaqazebo launch file and in seperate terminal launch slam toolbox for mapping ]
+
+```
+ros2 launch slam_toolbox online_async_launch.py params_file:=./src/emma_visualization/config/mapper_params_online_async.yaml use_sim_time:=true
+```
+
+In rviz change the frame id now to map as now the perspective is relative to map frame id.  
+
+move the robot around and save the map through slamtool box plugin in rviz. this will provide .pgm and .data files as your map files which we can later use it load for navigation 
+
 
 
 # Important ROS2 Commands

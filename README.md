@@ -157,14 +157,112 @@ This is provide the ```map``` frame id as can be noticed in mapper_params_online
 run gaqazebo launch file and in seperate terminal launch slam toolbox for mapping ]
 
 ```
-ros2 launch slam_toolbox online_async_launch.py params_file:=./src/emma_visualization/config/mapper_params_online_async.yaml use_sim_time:=true
+ros2 launch slam_toolbox online_async_launch.py slam_params_file:=./src/emma_visualization/config/mapper_params_online_async.yaml use_sim_time:=true
+
 ```
 
 In rviz change the frame id now to map as now the perspective is relative to map frame id.  
 
-move the robot around and save the map through slamtool box plugin in rviz. this will provide .pgm and .data files as your map files which we can later use it load for navigation 
+move the robot around and save the map through slamtool box plugin in rviz. this will provide .pgm and .data files as your map files which we can later use it load for localization 
+
+now  change mode in mapper_prams_online_async file fmode: mapping to localization ... and rerun this should load the saved map
+
+the map should appear in rviz and you should be able to see the saved map
 
 
+
+# Lcalization using AMCL
+
+```
+sudo apt install ros-humble-navigation2 ros-humble-nav2-bringup ros-humble-turtlebot3*
+```
+
+
+```
+ros2 run nav2_map_server map_server --ros-args -p yaml_filename:=maps/my_map_save.yaml -p use_sim_time:=true
+```
+
+this shoul load the saved map file and make that available of the /map topic but in a seperate run 
+```
+ros2 run nav2_util lifecycle_bringup map_server
+
+```
+After that you can see the map image file is loaded in nav2_map_server terminal .
+run rviz2 and gazebo launch .
+
+
+...................
+# Run AMCL
+
+```
+ros2 run nav2_amcl amcl -p use_sime_time:=true
+```
+
+now run with 
+```
+ros2 run nav2_util lifecycle_bringup amcl
+```
+After moving the robot in gazebo give 2d goal pose in rviz to localize
+
+# Nav2 stack
+```
+sudo apt install ros-humble-twist-mux
+```
+
+to remap command velocities on a single topic regardless if it is comming from nav2, joystick or keyboard ...
+
+Add twist_mux in configuation directory and edit the priority.
+```
+ros2 run twist_mux twist_mux --ros-args --params-file ./src/emma_visualization/config/twist_mux.yaml -r cmd_vel_out:=diff_cont/cmd_vel_unstamped
+```
+now the commad velocity are remapped to cmd_vel_unstamped 
+
+
+Steps to be followed for navigation stack
+- run gazebo
+- run rviz2 
+- run slam tool box 
+```
+ros2 launch slam_toolbox online_async_launch.py slam_params_file:=./src/emma_visualization/config/mapper_params_online_async.yaml use_sim_time:=true
+```
+try with localization_launch.py file as well for the slam_toolbox
+or 
+
+```
+ros2 launch nav2_bringup localization_launch.py map:=./maps/my_map_save.yaml use_sim_time:=true
+```
+but give inital pose after the map is loaded ...
+
+- run ```ros2 launch nav2_bringup navigation_launch.py use_sim_time:=true``` if neded add one extra paramater map_subscribe_transient_local:=true this tells nav2 to listen to the map at the start up
+
+
+So add two more maps ..in total three maps 
+default saved map, local and global map 
+
+
+# Adding launch files locally 
+```
+cp /opt/ros/humble/share/nav2_bringup/params/nav2_params.yaml src/emma_visualization/config/
+
+cp /opt/ros/humble/share/nav2_bringup/launch/navigation_launch.py src/emma_visualization/launch/
+
+cp /opt/ros/humble/share/nav2_bringup/launch/localization_launch.py src/emma_visualization/launch/
+
+cp /opt/ros/humble/share/nav2_bringup/launch/navigation_launch.py src/emma_visualization/launch/
+```
+
+and change the directory name to your package name ie emma_visualization 
+
+
+launch gazebo and rviz 
+launch localization file 
+```
+ros2 launch emma_visualization localization_launch.py use_sim_time:=true map:=./maps/my_map_save.yaml 
+```
+launch navigation 
+```
+ros2 launch emma_visualization navigation_launch.py use_sim_time:=true
+```
 
 # Important ROS2 Commands
 ``` 

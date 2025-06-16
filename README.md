@@ -7,7 +7,7 @@
 - [Important ROS2 Commands](#important-ros2-commands)
 
 # Navigation Stack with Gazebo classic
-![Alt text for the GIF](media/omron_gazebo.gif)
+![Navigation stack](media/omron_gazebo.gif)
 
 
 # Required Installations 
@@ -207,6 +207,8 @@ ros2 run nav2_util lifecycle_bringup amcl
 ```
 After moving the robot in gazebo give 2d goal pose in rviz to localize
 
+
+
 # Nav2 stack
 ```
 sudo apt install ros-humble-twist-mux
@@ -235,6 +237,12 @@ or
 ros2 launch nav2_bringup localization_launch.py map:=./maps/my_map_save.yaml use_sim_time:=true
 ```
 but give inital pose after the map is loaded ...
+
+Here you should be able to see the map frame as localization loads the saved map in .yaml file...
+
+### RQT TF TREE
+![TF trees](media/frames.png)
+
 
 - run ```ros2 launch nav2_bringup navigation_launch.py use_sim_time:=true``` if neded add one extra paramater map_subscribe_transient_local:=true this tells nav2 to listen to the map at the start up
 

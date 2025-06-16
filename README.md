@@ -6,6 +6,9 @@
 - [Gazebo camera](#gazebo-camera)
 - [Important ROS2 Commands](#important-ros2-commands)
 
+# Navigation Stack with Gazebo classic
+![Alt text for the GIF](media/omron_gazebo.gif)
+
 
 # Required Installations 
 

@@ -23,3 +23,22 @@ it should be close to 1. if RTF <1 it means simulation time is running slower th
 
 ##  ROS2 Cameras [setup link](https://docs.isaacsim.omniverse.nvidia.com/latest/ros2_tutorials/tutorial_ros2_camera.html)
 
+Dont forget to move the robot into the 
+
+Learn how to publish camera programatically [publishing camera data ]()
+
+
+## ROS2 Lidar [Lidar sensor](https://docs.isaacsim.omniverse.nvidia.com/latest/ros2_tutorials/tutorial_ros2_rtx_lidar.html)
+
+- Briefly introduce how to use RTX Lidar sensors.
+
+- Create a RTX Lidar sensor.
+
+- Publish sensor data to ROS2 as LaserScan and PointCloud2 messages.
+
+- Use the menu shortcut to create RTX Lidar sensor publishers.
+
+- Put it all together and visualize multiple sensors in RViz2.
+
+
+## [ROS2 Transform Trees and Odometry](https://docs.isaacsim.omniverse.nvidia.com/latest/ros2_tutorials/tutorial_ros2_tf.html#isaac-sim-app-tutorial-ros2-tf)

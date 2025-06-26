@@ -60,3 +60,5 @@ Learn how to publish camera programatically [publishing camera data ]()
 - Run  
 
 
+### Encountered Issue 
+- The damping was too low and because of that i was not able to rotate and move with teleop twist keyboard [Configure link](https://docs.omniverse.nvidia.com/isaacsim/latest/advanced_tutorials/tutorial_advanced_joint_tuning.html)

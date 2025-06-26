@@ -49,7 +49,7 @@ Learn how to publish camera programatically [publishing camera data ]()
 
 - import usd
 - created xforms of body and wheels
-- local corrdinates of all xforms set as y pointing sideways, xoforward and z upward. To ensure body and wheel rotations are aligned 
+- local corrdinates of all xforms set as y pointing sideways, xoforward and z upward. To ensure body and wheel local rotations are aligned. It does not matter the orientation of the child prims as long as the orientation of xforms are aligned.
 - Give rigid body API to xforms and collider API to child of xforms
 - Select body then xforms individually and create a revelote joint 
 - Add angular derive to Revolute joints and change the rotation axis to Y because in local coordinates the rotation is around Y

@@ -42,3 +42,21 @@ Learn how to publish camera programatically [publishing camera data ]()
 
 
 ## [ROS2 Transform Trees and Odometry](https://docs.isaacsim.omniverse.nvidia.com/latest/ros2_tutorials/tutorial_ros2_tf.html#isaac-sim-app-tutorial-ros2-tf)
+
+
+
+### How i rigged emma robot 
+
+- import usd
+- created xforms of body and wheels
+- local corrdinates of all xforms set as y pointing sideways, xoforward and z upward. To ensure body and wheel rotations are aligned 
+- Give rigid body API to xforms and collider API to child of xforms
+- Select body then xforms individually and create a revelote joint 
+- Add angular derive to Revolute joints and change the rotation axis to Y because in local coordinates the rotation is around Y
+- For organization i moved the joints to joints scope and renamed it 
+- Using measure tool i measure the distance between wheel and radius of the wheel
+- give articulationa root api to the root of the emma robot. in my case Emma_cobot
+- In differential drive omnigraph i added these values and the names of the joints. Emma_cobot has articulation root api so this would be the target prim 
+- Run  
+
+

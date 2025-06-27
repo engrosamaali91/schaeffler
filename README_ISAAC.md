@@ -48,6 +48,7 @@ Learn how to publish camera programatically [publishing camera data ]()
 ### How i rigged emma robot 
 
 - import usd
+- Inser physics ground plane and physics scene and in physics scene increase the Time steps per second value from 60 to 290
 - created xforms of body and wheels
 - local corrdinates of all xforms set as y pointing sideways, xoforward and z upward. To ensure body and wheel local rotations are aligned. It does not matter the orientation of the child prims as long as the orientation of xforms are aligned.
 - Give rigid body API to xforms and collider API to child of xforms
@@ -62,3 +63,13 @@ Learn how to publish camera programatically [publishing camera data ]()
 
 ### Encountered Issue 
 - The damping was too low and because of that i was not able to rotate and move with teleop twist keyboard [Configure link](https://docs.omniverse.nvidia.com/isaacsim/latest/advanced_tutorials/tutorial_advanced_joint_tuning.html)
+
+
+
+
+
+### Runnning process
+This would match isaac sim time and ros2 time.
+```ros2 param set /rviz use_sim_time true```
+
+Run above command after running rviz2 as we are telling this node /rviz to use the isaac sim time

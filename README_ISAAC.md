@@ -66,10 +66,30 @@ Learn how to publish camera programatically [publishing camera data ]()
 
 
 
+- The reason why laser was moving along with robot was becuase i used the wrong frame id, the frameid is supposed to be the xform under which the lidar is placed.
+
 
 
 ### Runnning process
 This would match isaac sim time and ros2 time.
 ```ros2 param set /rviz use_sim_time true```
 
-Run above command after running rviz2 as we are telling this node /rviz to use the isaac sim time
+##### Issue: Discrepancy in Robot Motion Visualization (Isaac Sim vs. RViz)
+
+**Problem:**
+* The robot's actual direction of motion within Isaac Sim appeared opposite to its displayed movement in RViz.
+* This occurred despite verifying that `cmd_vel` commands were being sent correctly and interpreted as "forward" in Isaac Sim.
+
+**Root Cause:**
+* The primary reason was a misalignment in coordinate frame conventions. Specifically, the forward axis (+X) of the robot's base link (or the lidar's frame which dictates the base's orientation) within the Isaac Sim model was oriented differently from the expected ROS REP 103 standard for the `base_link` frame in RViz.
+
+**Solution:**
+* The orientation of the lidar (or the robot's base link itself) was adjusted within the Isaac Sim stage (or its corresponding URDF/USD definition).
+* This adjustment ensured that the +X axis of the `base_link` frame, as published via TF to RViz, accurately represented the robot's forward direction of travel in the simulation.
+
+**Outcome:**
+* The robot's motion in Isaac Sim and its visualization in RViz now correctly correspond, providing an accurate representation of the robot's state.
+
+Right now i am going through [Core API Tutorial Series](https://docs.isaacsim.omniverse.nvidia.com/latest/core_api_tutorials/index.html#isaac-sim-core-api-tutorials-page)
+
+

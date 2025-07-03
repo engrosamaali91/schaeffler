@@ -93,3 +93,140 @@ This would match isaac sim time and ros2 time.
 Right now i am going through [Core API Tutorial Series](https://docs.isaacsim.omniverse.nvidia.com/latest/core_api_tutorials/index.html#isaac-sim-core-api-tutorials-page)
 
 
+
+
+
+### Navigation stack process
+# ROS 2 Navigation Workflow with Isaac Sim Turtlebot
+
+## Workflow Steps
+
+1. **Create the Map**
+   - Launch SLAM Toolbox:
+     ```
+     ros2 launch slam_toolbox online_async_launch.py use_sim_time:=true
+     ```
+   - Launch RViz2:
+     ```
+     ros2 run rviz2 rviz2
+     ```
+   - In RViz2:
+     - Set **Fixed Frame** to `map`.
+     - Enable **Use Sim Time**:
+       ```
+       Panels > Displays > Global Options > Use Sim Time: True
+       ```
+     - If the occupancy grid does not show, set **Durability Policy** of the Map display to **Transient Local**.
+   - Save the map:
+     ```
+     ros2 run nav2_map_server map_saver_cli -f ~/nav2_config/maps/my_map
+     ```
+
+2. **Localization**
+   - Launch localization with your saved map:
+     ```
+     ros2 launch nav2_bringup localization_launch.py \
+       map:=/home/schaeffler/nav2_config/maps/my_map.yaml \
+       use_sim_time:=true
+     ```
+   - In RViz2, click **2D Pose Estimate** to set the initial pose.
+   - Confirm laser scan and point cloud align with the map.
+
+3. **Navigation**
+   - Launch navigation:
+     ```
+     ros2 launch nav2_bringup navigation_launch.py \
+       use_sim_time:=true \
+       param_file:=/home/schaeffler/nav2_config/nav2_params.yaml
+     ```
+   - In RViz2, click **2D Nav Goal** to send a goal.
+
+## Notes
+- Keep `base_frame_id` consistent (`base_footprint` or `base_link`).
+- Make sure Isaac Sim publishes `/clock`.
+- Always set **Use Sim Time** in RViz2.
+- Confirm `/tf` tree shows:
+  ```
+  map -> odom -> base_link
+  ```
+- If the map or transforms are missing, re-check:
+  - Durability Policy (`Transient Local`).
+  - Sim time synchronization.
+  - Initial pose estimate.
+
+✅ Done! Your robot should now localize and navigate in simulation.
+
+
+
+# ROS 2 Navigation Workflow with Isaac Sim Emma robot
+
+This guide documents the complete workflow to create a map, localize, and navigate using Nav2 with simulation time in Isaac Sim.
+
+---
+
+## 🟢 1. Start Isaac Sim
+Launch Isaac Sim and ensure `/clock` is being published for simulation time.
+
+---
+
+## 2. Build the Map with SLAM Toolbox
+Launch SLAM Toolbox:
+
+```bash
+ros2 launch slam_toolbox online_async_launch.py use_sim_time:=true
+```
+Move the robot around in the environment
+
+## 3. Save the Map
+Launch SLAM Toolbox:
+```
+ros2 run nav2_map_server map_saver_cli -f ~/nav2_config/maps/my_map
+```
+
+This creates:
+- my_map.yaml
+- my_map.pgm
+
+
+## 4. Launch RViz
+
+```
+rviz2 
+```
+```
+ros2 param set /rviz use_sim_time true
+```
+
+## 5. Launch Localization
+```
+ros2 launch nav2_bringup localization_launch.py \
+  map:=/home/schaeffler/nav2_config/maps/my_map.yaml \
+  use_sim_time:=true
+```
+
+Important:
+
+- In RViz, set the Map display Durability Policy to Transient Local so the map appears.
+
+- Use 2D Pose Estimate in RViz to set the initial robot pose.
+
+
+## 6. Launch Navigation 
+```
+ros2 launch nav2_bringup bringup_launch.py \
+  map:=/home/schaeffler/nav2_config/maps/my_map.yaml \
+  use_sim_time:=true \
+  params_file:=/home/schaeffler/nav2_config/nav2_params.yaml
+```
+
+And in rviz now you can give navigation goal 
+
+## Recap of Common Issues and Fixes
+
+- Map Not Showing in RViz: Change the Durability Policy to Transient Local.
+
+- Time Sync Errors: Always set use_sim_time to true everywhere and run ros2 param set /rviz use_sim_time true.
+
+- TF Issues: Make sure you use consistent base_frame_id (e.g., base_footprint) and odom/map frames in AMCL and Nav2 configs.
+
+- Startup Order: Always launch Isaac Sim first, then SLAM, then save the map, then Localization, and finally Navigation.

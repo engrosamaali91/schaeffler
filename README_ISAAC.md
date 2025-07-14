@@ -230,3 +230,39 @@ And in rviz now you can give navigation goal
 - TF Issues: Make sure you use consistent base_frame_id (e.g., base_footprint) and odom/map frames in AMCL and Nav2 configs.
 
 - Startup Order: Always launch Isaac Sim first, then SLAM, then save the map, then Localization, and finally Navigation.
+
+
+
+
+
+# Manual Tuning 
+## Sim2Real Parameter Tuning for AGV Simulation
+
+The objective is to tune simulation parameters (especially damping) to ensure the robot's simulated motion accurately replicates commanded velocities.
+
+## 📈 Objectives
+
+- Compare `/cmd_vel` commands vs. `/odom` measured velocities.
+- Quantify error using RMSE.
+- Iteratively adjust physics parameters to minimize RMSE.
+- Document results at each step.
+
+
+
+5. **Adjust Parameters:**
+- Reduce damping iteratively.
+- Re-run the process.
+
+6. **Track Results:**
+- Record RMSE for each damping value.
+
+## 🧪 Iterative Tuning Process
+
+Below is the table tracking each experiment:
+
+| Iteration | Damping Value | Max Force | RMSE Linear Velocity (m/s) | RMSE Linear Velocity (m/s) | 
+|-----------|---------------|-----------|----------------------------|----------------------------|
+| 1         | 1e9           | unlimited | 0.4447                     | 0.7639                     | 
+| 2         | 1e8           |     unlimited      | 0.4075            | 0.6656                     |  
+| 3         | 1e7           |      unlimited    |                   Robot stoped           |             Robot stoped               
+

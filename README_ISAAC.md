@@ -260,9 +260,91 @@ The objective is to tune simulation parameters (especially damping) to ensure th
 
 Below is the table tracking each experiment:
 
-| Iteration | Damping Value | Max Force | RMSE Linear Velocity (m/s) | RMSE Linear Velocity (m/s) | 
+| Iteration | Damping Value | Max Force | RMSE Linear Velocity (m/s) | RMSE Angular Velocity (m/s) | 
 |-----------|---------------|-----------|----------------------------|----------------------------|
 | 1         | 1e9           | unlimited | 0.4447                     | 0.7639                     | 
 | 2         | 1e8           |     unlimited      | 0.4075            | 0.6656                     |  
 | 3         | 1e7           |      unlimited    |                   Robot stoped           |             Robot stoped               
+
+---
+
+## Monday Troubleshooting Plan & Checklist
+
+### 1. Confirm the Problem
+- [ ] Identify if `/odom` drifts away from the true pose (ground truth) in Isaac Sim.
+
+### 2. Odometry Diagnostics
+- [ ] Check if Isaac Sim publishes a ground truth pose topic (e.g., `/ground_truth_pose`).
+- [ ] Plot `/odom` vs. ground truth in PlotJuggler to visualize drift.
+- [ ] Plot `/cmd_vel` vs. `/odom` in PlotJuggler to check for slippage or lag.
+
+### 3. Physics Parameter Tuning in Isaac Sim
+- [ ] Increase wheel friction and damping values.
+- [ ] Test and record RMSE between `/cmd_vel` and `/odom` for each change.
+- [ ] Observe robot motion for signs of slippage.
+
+### 4. Navigation/Localization Parameter Tuning
+- [ ] Set `laser_min_range: 0.5` and `laser_max_range: 8.0` (or 10.0) in `nav2_params.yaml`.
+- [ ] Increase `min_particles` and `max_particles` in AMCL (e.g., 1000 and 5000).
+- [ ] Increase `alpha1` and `alpha2` (e.g., 0.4) if odometry is noisy.
+- [ ] Lower `update_min_d` and `update_min_a` (e.g., 0.1) for more frequent AMCL updates.
+
+### 5. Debugging and Validation
+- [ ] Launch localization and navigation.
+- [ ] Set initial pose in RViz and send a goal.
+- [ ] Observe if scan stays aligned with the map and robot reaches the goal.
+- [ ] If still failing, try using Isaac Sim’s ground truth as `/odom` for debugging.
+
+### 6. Documentation
+- [ ] Update the Troubleshooting Change Log in `README_ISAAC.md`.
+- [ ] Document all parameter changes, results, and observations.
+
+---
+
+### Key Parameters Table
+
+| Parameter                | Where                | Why/What to Try                |
+|--------------------------|----------------------|--------------------------------|
+| Wheel friction/damping   | Isaac Sim            | Reduce slippage, improve odom  |
+| `laser_min_range`        | nav2_params.yaml     | Match lidar hardware           |
+| `laser_max_range`        | nav2_params.yaml     | Match lidar hardware           |
+| `min_particles`          | nav2_params.yaml     | Increase for robust AMCL       |
+| `max_particles`          | nav2_params.yaml     | Increase for robust AMCL       |
+| `alpha1`, `alpha2`       | nav2_params.yaml     | Increase if odom is noisy      |
+| `update_min_d`, `update_min_a` | nav2_params.yaml | Lower for more frequent AMCL updates |
+
+---
+
+You will now find the Monday Troubleshooting Plan & Checklist and the Key Parameters Table at the end of your `README_ISAAC.md` file. This will help you stay organized and focused when you return to your project!
+
+
+---
+
+## Problem: Costmap Sensor Origin Out of Bounds
+
+**Error Message:**
+```
+[local_costmap.local_costmap]: Sensor origin at (X, Y, Z) is out of map bounds (A, B, C) to (D, E, F). The costmap cannot raytrace for it.
+```
+
+**What it means:**
+- The sensor (usually lidar) is outside the area covered by the local costmap, so the costmap cannot update or raytrace obstacles correctly.
+
+**Common causes:**
+- Robot pose estimate (localization) is drifting or incorrect
+- Costmap size or origin is too small or misaligned
+- Sensor TF or placement is wrong
+
+**Impact:**
+- The robot may not see obstacles, the costmap may not update, and navigation can fail or behave unpredictably.
+
+---
+
+## Session Change Log - 2024-07-21
+
+- Changed local costmap width and height to 5 (from previous value)
+- Changed robot_radius value in both local and global costmaps
+- Added QoS node to each OmniGraph publisher in Isaac Sim (including LaserScan, TF, etc.)
+
+---
 

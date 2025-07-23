@@ -348,3 +348,21 @@ You will now find the Monday Troubleshooting Plan & Checklist and the Key Parame
 
 ---
 
+
+---
+
+## Parameter Change Log: Inflation Radius
+
+| Parameter         | Location                | Old Value | New Value | Observed Effect in Simulation                         |
+|-------------------|-------------------------|-----------|-----------|------------------------------------------------------|
+| robot_radius      | local/global costmap    | 0.22/0.45 | 0.95      | Costmap warning disappeared, safer obstacle avoidance|
+| inflation_radius  | local_costmap           | 0.55      | 0.95      | Robot avoids new/dynamic obstacles, fewer collisions |
+| inflation_radius  | global_costmap          | 0.55      | 0.95      | Robot plans safer paths, keeps distance from obstacles|
+
+**Impact:**
+- Increasing the robot_radius and inflation_radius to match the robot's true size improved obstacle avoidance and eliminated costmap warnings.
+- The robot now avoids both static and newly added obstacles in the environment, reducing collisions.
+- The inflation radius determines the "buffer zone" around obstacles in the costmap, and should be at least as large as the robot's radius for safe navigation.
+
+---
+

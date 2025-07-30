@@ -366,3 +366,20 @@ You will now find the Monday Troubleshooting Plan & Checklist and the Key Parame
 
 ---
 
+
+---
+
+## Session Change Log - 2024-07-23
+
+| Change                                      | Location/Parameter         | Old Value         | New Value         | Effect/Notes                                      |
+|----------------------------------------------|---------------------------|-------------------|-------------------|---------------------------------------------------|
+| Changed global_frame from odom to map        | local_costmap             | odom              | map               | Costmap frame matches published data              |
+| Commented out voxel_layer                    | local_costmap plugins     | Included          | Commented out     | Simplified costmap, easier debugging              |
+| Added obstacle_layer to plugins              | local_costmap plugins     | Not present       | Added             | Real-time obstacles now marked in costmap         |
+
+**Result:**
+- Robot is now avoiding real-time obstacles in the scene.
+- Laser scan is not perfectly aligned (may need further tuning).
+
+---
+

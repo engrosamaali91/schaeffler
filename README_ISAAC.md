@@ -330,13 +330,32 @@ You will now find the Monday Troubleshooting Plan & Checklist and the Key Parame
 **What it means:**
 - The sensor (usually lidar) is outside the area covered by the local costmap, so the costmap cannot update or raytrace obstacles correctly.
 
-**Common causes:**
-- Robot pose estimate (localization) is drifting or incorrect
-- Costmap size or origin is too small or misaligned
-- Sensor TF or placement is wrong
+**Problem Analysis Process:**
+1. **Initial attempts:** Increased local costmap width and height from 5x5 to 6x6, 7x7, 8x8, and even 10x10 meters
+2. **TF tree investigation:** Verified that base_link → base_scan transform was correct
+3. **Sensor configuration:** Checked Isaac Sim lidar settings and ROS2 scan topic frame_id
+4. **Costmap parameters:** Updated scan range parameters to match Isaac Sim lidar settings
+5. **Root cause discovery:** Identified that the issue was caused by using a **voxel_layer** with a **2D lidar**
 
-**Impact:**
-- The robot may not see obstacles, the costmap may not update, and navigation can fail or behave unpredictably.
+**Root Cause:**
+- **Voxel layers are designed for 3D sensors** (PointCloud2 data from depth cameras, 3D lidars, stereo cameras)
+- **2D lidars produce LaserScan messages** with 2D points in a horizontal plane
+- **Mismatch:** The voxel layer was trying to process 2D laser data as if it were 3D, causing 3D bounds checking to fail
+
+**Solution:**
+- **Removed voxel_layer** from local_costmap plugins
+- **Kept obstacle_layer and inflation_layer** for 2D navigation
+
+**Result:**
+- ✅ Warnings completely disappeared
+- ✅ 2D navigation functionality preserved
+- ✅ Optimized costmap configuration for 2D lidar
+- ✅ No performance impact from unnecessary 3D processing
+
+**Key Learning:**
+- **2D navigation** → **2D obstacle detection** (obstacle_layer)
+- **3D navigation** → **3D obstacle detection** (voxel_layer)
+- Always match sensor type with appropriate costmap layers
 
 ---
 

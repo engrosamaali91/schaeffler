@@ -15,5 +15,6 @@
         "/opt/ros/humble/lib/python3.10/site-packages",
         "/opt/ros/humble/local/lib/python3.10/dist-packages"
     ],
-    "cmake.sourceDirectory": "/home/schaeffler/schaeffler/src/emma_visualization"
+    "cmake.sourceDirectory": "/home/schaeffler/schaeffler/src/emma_visualization",
+    "ros.distro": "humble"
 }

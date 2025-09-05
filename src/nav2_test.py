@@ -48,7 +48,8 @@ def main():
 	# 	# print(feedback)
 
 	waypoints = [goal_pose1, goal_pose2]
-	nav.goThroughPoses(waypoints)
+	nav.followWaypoints(waypoints)
+	# nav.goThroughPoses(waypoints)
 	while not nav.isTaskComplete():
 		feedback = nav.getFeedback()
 		# print(feedback)

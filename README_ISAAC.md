@@ -402,3 +402,22 @@ You will now find the Monday Troubleshooting Plan & Checklist and the Key Parame
 
 ---
 
+
+## Launch with bringup file
+
+Launch localization and navigation from single bring up file aftter running isaac sim.
+```
+cd /home/schaeffler/schaeffler
+source install/setup.bash
+ros2 launch nav_bringup bringup_launch.py use_sim_time:=true map:=src/nav_bringup/maps/slam_map.yaml
+```
+Open rviz2
+```
+ros2 run rviz2 rviz2 --ros-args -p use_sim_time:=true
+```
+
+Localize the robot and send waypoints/gothrough poses programatically
+```
+source ros2env/bin/activate
+python nav2_test.py 
+```

@@ -36,8 +36,8 @@ def main():
 	# 5) Block until the Nav2 stack reports it is active (all lifecycle nodes activated)
 	nav.waitUntilNav2Active()
 
-	goal_pose1 = create_pose_stamped(nav, 7.00, 3.00, 1.57)
-	goal_pose2 = create_pose_stamped(nav, 8.00, 3.00, 0.00	)
+	goal_pose1 = create_pose_stamped(nav, 3.00, 0.00, 0.00)
+	# goal_pose2 = create_pose_stamped(nav, 8.00, 3.00, 0.00	)
 	# goal_pose3 = create_pose_stamped(nav, 2.00, 3.00, 1.57)
 	
 	
@@ -47,7 +47,7 @@ def main():
 	# 	feedback = nav.getFeedback()
 	# 	# print(feedback)
 
-	waypoints = [goal_pose1, goal_pose2]
+	waypoints = [goal_pose1 ]
 	nav.followWaypoints(waypoints)
 	# nav.goThroughPoses(waypoints)
 	while not nav.isTaskComplete():

@@ -3,7 +3,6 @@
 This document explains how to set up and use the custom `nav_bringup` package for running the ROS 2 Navigation Stack (Nav2) with Isaac Sim. It covers the process of creating the package, copying and adapting launch files, and launching the navigation stack with a map for localization.
 
 ---
-
 ## 1. Package Creation: `nav_bringup`
 
 The `nav_bringup` package was created to provide a custom bringup solution for navigation with Isaac Sim. It contains:

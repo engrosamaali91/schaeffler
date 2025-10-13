@@ -1,12 +1,12 @@
 {
   "best_J": 1.34,
   "best_vals": {
-    "controller_server.FollowPath.max_vel_x": 0.28237817579895014,
+    "controller_server.FollowPath.max_vel_x": 0.3066824391059338,
     "controller_server.FollowPath.acc_lim_x": 2.0,
-    "controller_server.FollowPath.max_vel_theta": 1.0669390392143787,
+    "controller_server.FollowPath.max_vel_theta": 1.1383589133997016,
     "controller_server.FollowPath.acc_lim_theta": 2.0,
-    "controller_server.FollowPath.sim_time": 1.854980055864138,
-    "controller_server.FollowPath.xy_goal_tolerance": 0.27200668077242574
+    "controller_server.FollowPath.sim_time": 2.0,
+    "controller_server.FollowPath.xy_goal_tolerance": 0.29595053753932926
   },
   "step_frac": {
     "controller_server.FollowPath.max_vel_x": 0.105,
@@ -17,12 +17,12 @@
     "controller_server.FollowPath.xy_goal_tolerance": 0.105
   },
   "last_vals": {
-    "controller_server.FollowPath.max_vel_x": 0.28237817579895014,
+    "controller_server.FollowPath.max_vel_x": 0.3066824391059338,
     "controller_server.FollowPath.acc_lim_x": 2.0,
-    "controller_server.FollowPath.max_vel_theta": 1.0669390392143787,
+    "controller_server.FollowPath.max_vel_theta": 1.1383589133997016,
     "controller_server.FollowPath.acc_lim_theta": 2.0,
-    "controller_server.FollowPath.sim_time": 1.854980055864138,
-    "controller_server.FollowPath.xy_goal_tolerance": 0.27200668077242574
+    "controller_server.FollowPath.sim_time": 2.0,
+    "controller_server.FollowPath.xy_goal_tolerance": 0.29595053753932926
   },
   "last_J": 1.34,
   "sign": {

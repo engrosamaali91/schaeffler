@@ -34,7 +34,9 @@ for r in optimizer.res:
     ys.append(r["params"]["y"])
     ts.append(r["target"])
 
-xs = np.array(xs); ys = np.array(ys); ts = np.array(ts)
+xs = np.array(xs)
+ys = np.array(ys)
+ts = np.array(ts)
 iters = np.arange(1, len(ts)+1)
 best_so_far = np.maximum.accumulate(ts)
 

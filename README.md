@@ -421,3 +421,18 @@ Localize the robot and send waypoints/gothrough poses programatically
 source ros2env/bin/activate
 python nav2_test.py 
 ```
+
+## IsaacSim Launch Command
+
+Build the workspace
+```bash
+cd ~/IsaacSim-ros_workspaces/humble_ws
+colcon build --symlink-install
+source install/setup.bash
+```
+
+To load your USD file into IsaacSim and automatically play the simulation on startup, use the following `ros2` launch command:
+
+```bash
+ros2 launch isaacsim run_isaacsim.launch.py gui:="/path/to/your/file.emma.usd" play_sim_on_start:="true"
+```

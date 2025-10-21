@@ -79,18 +79,3 @@ All initial parameters in `nav2_params.yaml` are derived from the real robot’s
 | *(derived)*                             | Linear stop detection threshold    | `controller_server.FollowPath.trans_stopped_velocity`                               | ~0.05 × `max_vel_x` ≈ **0.06 m/s**        | **0.25 m/s**              |
 
 
-
-## IsaacSim Launch Command
-
-Build the workspace
-```bash
-cd ~/IsaacSim-ros_workspaces/humble_ws
-colcon build --symlink-install
-source install/setup.bash
-```
-
-To load your USD file into IsaacSim and automatically play the simulation on startup, use the following `ros2` launch command:
-
-```bash
-ros2 launch isaacsim run_isaacsim.launch.py gui:="/path/to/your/file.emma.usd" play_sim_on_start:="true"
-```

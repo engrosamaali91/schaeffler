@@ -1,0 +1,24 @@
+<package format="3">
+  <name>agv_orchestrator</name>
+  <version>0.0.0</version>
+  <description>Orchestrates Isaac Sim + Nav2 bringup</description>
+  <maintainer email="engr.osamaali91@gmail.com">schaeffler</maintainer>
+  <license>TODO: License declaration</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- runtime deps for launch -->
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
+  <!-- these are optional; keep only if the package names are correct on your machine -->
+  <exec_depend>nav_bringup</exec_depend>
+  <exec_depend>isaacsim</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

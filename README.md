@@ -436,3 +436,12 @@ To load your USD file into IsaacSim and automatically play the simulation on sta
 ```bash
 ros2 launch isaacsim run_isaacsim.launch.py gui:="/path/to/your/file.emma.usd" play_sim_on_start:="true"
 ```
+
+
+Relative path of usd file can also be given, make sure the paht
+
+```bash
+ros2 launch isaacsim run_isaacsim.launch.py gui:="~/Downloads/omron_emma/emma.usd" play_sim_on_start:="true" 
+```
+
+

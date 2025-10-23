@@ -8,6 +8,12 @@ install(DIRECTORY launch/
   DESTINATION share/${PROJECT_NAME}/launch
 )
 
+# NEW: install rviz configs
+install(DIRECTORY rviz/
+  DESTINATION share/${PROJECT_NAME}/rviz
+)
+
+
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
   set(ament_cmake_copyright_FOUND TRUE)

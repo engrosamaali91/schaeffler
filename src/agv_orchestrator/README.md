@@ -29,7 +29,11 @@ source ~/schaeffler/install/setup.bash
 
 3. Launch the orchestrated startup (example):
 ```bash
-ros2 launch agv_orchestrator isaac_and_nav2.launch.py
+ros2 launch agv_orchestrator isaac_and_nav2.launch.py \
+  usd_path:=/home/schaeffler/Downloads/omron_emma/emma.usd \
+  play_sim_on_start:=true \
+  map:=src/nav_bringup/maps/slam_map.yaml
+
 ```
 
 Or to run Isaac Sim directly (example parameters):

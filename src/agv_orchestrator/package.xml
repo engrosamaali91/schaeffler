@@ -14,6 +14,7 @@
   <!-- these are optional; keep only if the package names are correct on your machine -->
   <exec_depend>nav_bringup</exec_depend>
   <exec_depend>isaacsim</exec_depend>
+  <exec_depend>rviz2</exec_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

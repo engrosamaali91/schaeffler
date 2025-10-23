@@ -13,8 +13,8 @@ def generate_launch_description():
     play_sim_on_start = LaunchConfiguration("play_sim_on_start")
     map_yaml = LaunchConfiguration("map")
     params_file = LaunchConfiguration("params_file")
-    rviz = LaunchConfiguration("rviz")                 # NEW
-    rviz_config = LaunchConfiguration("rviz_config")   # NEW
+    rviz = LaunchConfiguration("rviz")                 
+    rviz_config = LaunchConfiguration("rviz_config")   
 
     # package shares
     nav_bringup_share = FindPackageShare("nav_bringup")
@@ -43,7 +43,7 @@ def generate_launch_description():
         description="Nav2 parameters YAML file",
     )
 
-    # NEW: rviz toggle + config path
+    # rviz toggle and config path
     declare_rviz = DeclareLaunchArgument(
         "rviz", default_value="true",
         description="Launch RViz2 (true/false)",

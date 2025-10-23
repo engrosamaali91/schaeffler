@@ -27,24 +27,52 @@ colcon build --packages-select agv_orchestrator
 source ~/schaeffler/install/setup.bash
 ```
 
-3. Launch the orchestrated startup (example):
+3. Launch examples:
+
+Basic launch with defaults:
+```bash
+ros2 launch agv_orchestrator isaac_and_nav2.launch.py
+```
+
+Launch with custom USD and Nav2 params:
 ```bash
 ros2 launch agv_orchestrator isaac_and_nav2.launch.py \
   usd_path:=/home/schaeffler/Downloads/omron_emma/emma.usd \
   play_sim_on_start:=true \
-  map:=src/nav_bringup/maps/slam_map.yaml
-
+  params_file:=/path/to/custom_nav2_params.yaml
 ```
 
-Or to run Isaac Sim directly (example parameters):
+Launch with RViz2 (optional):
 ```bash
-ros2 launch isaacsim run_isaacsim.launch.py gui:="/home/schaeffler/Downloads/omron_emma/emma.usd" play_sim_on_start:=true
+# Launch with default RViz configuration
+ros2 launch agv_orchestrator isaac_and_nav2.launch.py rviz:=true
+
+# Launch with custom RViz configuration
+ros2 launch agv_orchestrator isaac_and_nav2.launch.py \
+  rviz:=true \
+  rviz_config:=/path/to/custom_rviz.rviz
 ```
 
 ## What this package does
 
 - Includes the Isaac Sim launch from the Isaac Sim ROS workspace.
-- Includes Nav2 bringup from `nav_bringup`.
+- Includes Nav2 bringup from `nav_bringup` with configurable parameter files.
 - Applies a configurable delay to Nav2 startup so ISAAC topics are available before Nav2 initializes.
+- Optional RViz2 launch with customizable configuration.
 - Exposes configurable launch arguments in `launch/isaac_and_nav2.launch.py`.
+
+## Launch Arguments
+
+Key arguments you can customize:
+- `params_file`: Path to Nav2 parameters YAML file (default: uses nav_bringup's params)
+- `rviz`: Enable/disable RViz2 visualization (default: false)
+- `rviz_config`: Custom RViz configuration file (optional)
+- `map`: Path to the map file
+- `usd_path`: Path to the USD scene file
+- `play_sim_on_start`: Whether to start simulation automatically
+
+You can check all available arguments with:
+```bash
+ros2 launch agv_orchestrator isaac_and_nav2.launch.py --show-args
+```
 

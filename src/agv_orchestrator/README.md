@@ -46,11 +46,6 @@ Launch with RViz2 (optional):
 ```bash
 # Launch with default RViz configuration
 ros2 launch agv_orchestrator isaac_and_nav2.launch.py rviz:=true
-
-# Launch with custom RViz configuration
-ros2 launch agv_orchestrator isaac_and_nav2.launch.py \
-  rviz:=true \
-  rviz_config:=/path/to/custom_rviz.rviz
 ```
 
 ## What this package does

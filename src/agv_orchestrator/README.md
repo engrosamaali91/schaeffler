@@ -45,7 +45,7 @@ ros2 launch agv_orchestrator isaac_and_nav2.launch.py \
 Launch with RViz2 (optional):
 ```bash
 # Launch with default RViz configuration
-ros2 launch agv_orchestrator isaac_and_nav2.launch.py rviz:=true
+ros2 launch agv_orchestrator isaac_and_nav2.launch.py rviz:=true run_test:=false
 ```
 
 ## What this package does
@@ -65,9 +65,12 @@ Key arguments you can customize:
 - `map`: Path to the map file
 - `usd_path`: Path to the USD scene file
 - `play_sim_on_start`: Whether to start simulation automatically
+- `run_test`: whether to run the script and move the robot to the goal
 
 You can check all available arguments with:
 ```bash
 ros2 launch agv_orchestrator isaac_and_nav2.launch.py --show-args
 ```
+
+
 

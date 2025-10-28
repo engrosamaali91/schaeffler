@@ -15,6 +15,7 @@ def generate_launch_description():
     params_file = LaunchConfiguration("params_file")
     rviz = LaunchConfiguration("rviz")                 
     rviz_config = LaunchConfiguration("rviz_config")   
+    run_test = LaunchConfiguration("run_test")
 
     # package shares
     nav_bringup_share = FindPackageShare("nav_bringup")
@@ -53,6 +54,11 @@ def generate_launch_description():
         default_value=PathJoinSubstitution([orchestrator_share, "rviz", "config.rviz"]),
         description="RViz2 config file",
     )
+    declare_run_test = DeclareLaunchArgument(
+    "run_test",
+    default_value="false",
+    description="Run nav2_test.py after Nav2 is active (true/false)",
+    )
 
     # Isaac Sim launcher (from IsaacSim ROS workspace)
     isaac_launch = IncludeLaunchDescription(
@@ -89,10 +95,25 @@ def generate_launch_description():
         condition=IfCondition(rviz),
     )
 
+    # run Python script (installed via CMake) as a node
+    nav2_test_node = Node(
+        package="agv_orchestrator",
+        executable="nav2_test.py",
+        name="nav2_test",
+        output="screen",
+        condition=IfCondition(run_test),
+    )
+
+    # Delay your script until after Nav2 delay (20s) + a little buffer (10s)
+    delayed_nav2_test = TimerAction(period=30.0, actions=[nav2_test_node])
+
+
     return LaunchDescription([
         declare_usd, declare_play, declare_map, declare_params,
         declare_rviz, declare_rviz_config,
+        declare_run_test,
         isaac_launch,
         delayed_nav2,
         rviz_node,
+        delayed_nav2_test,
     ])

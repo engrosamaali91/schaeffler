@@ -13,6 +13,11 @@ install(DIRECTORY rviz/
   DESTINATION share/${PROJECT_NAME}/rviz
 )
 
+# Install Python execs into lib/${PROJECT_NAME} so launch can run them
+install(PROGRAMS scripts/nav2_test.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

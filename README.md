@@ -14,6 +14,16 @@
 - Creating and using ROS2 Clock Publisher and Subscriber nodes.
 
 
+```bash
+
+ros2 run rviz2 rviz2 
+ros2 param set /rviz use_sim_time true
+
+```
+
+To verify the rviz time is same as simulation time , the ros time and ros elapsed time would be same
+
+
 ## ROS2 Publish Real Time Factor [Setup link](https://docs.isaacsim.omniverse.nvidia.com/latest/ros2_tutorials/tutorial_ros2_rtf.html)
 
 it should be close to 1. if RTF <1 it means simulation time is running slower than the real time.
@@ -443,5 +453,8 @@ Relative path of usd file can also be given, make sure the paht
 ```bash
 ros2 launch isaacsim run_isaacsim.launch.py gui:="~/Downloads/omron_emma/emma.usd" play_sim_on_start:="true" 
 ```
+
+
+
 
 

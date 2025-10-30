@@ -54,7 +54,7 @@ All initial parameters in `nav2_params.yaml` are derived from the real robot’s
 | RotAccel = 90 deg/s² | acc_lim_theta = 1.57 | rad/s² | MobilePlanner |
 
 ### Bounds
-`bounds.yaml` defines allowed search space for the optimizer based on the same physical limits.
+`bounds.yaml` defines allowed search space for the optimizer based on the same physical limits of the real robot.
 
 ### Optimization Loop
 1. Start with `nav2_params.yaml`
@@ -79,3 +79,39 @@ All initial parameters in `nav2_params.yaml` are derived from the real robot’s
 | *(derived)*                             | Linear stop detection threshold    | `controller_server.FollowPath.trans_stopped_velocity`                               | ~0.05 × `max_vel_x` ≈ **0.06 m/s**        | **0.25 m/s**              |
 
 
+
+## ✅ In Summary — Key Motion Parameters
+
+| Term | Intuitive Meaning | Formula / Effect |
+|------|--------------------|------------------|
+| **max_vel_x** | “How fast can I go?” | Defines the **maximum linear speed** the robot can reach (m/s). |
+| **acc_lim_x** | “How quickly can I get there?” | Sets the **rate of acceleration** (m/s²). A higher value → snappier motion; lower value → smoother, slower ramp-up. |
+| **Ramp time** | “How long does it take to reach top speed?” | ```t = v_max / a_lim```  →  shorter = snappier motion, longer = smoother motion |
+
+
+
+### Concept
+
+During navigation, the robot begins each motion at 0 m/s and ramps its velocity until reaching max_vel_x, respecting the limit imposed by ```acc_lim_x```.
+The pair (```max_vel_x, acc_lim_x```) directly shapes how aggressively or smoothly the robot accelerates and decelerates in simulation versus reality.
+
+In the Sim2Real optimization, these are the primary tuning knobs:
+
+```max_vel_x``` controls the steady-state speed the simulated AGV maintains.
+
+```acc_lim_x``` controls the shape and timing of the velocity curve (the ramp).
+
+The goal of optimization is to find parameter values that reproduce the real robot’s acceleration profile and motion timing inside simulation, minimizing the measured Sim2Real gap (J).
+
+
+### ⚠️ Limitations of the Adaptive Step-Size Optimizer
+
+This optimizer adapts **all parameter values** based on a **single global KPI (J)** — it does not know which individual key caused the improvement or degradation.
+
+| Aspect | Description |
+|--------|--------------|
+| **Global feedback** | Uses one J value for all keys; if J worsens, all parameters are adjusted (even if only one caused it). |
+| **No parameter interaction modeling** | Does not learn relationships or coupling between parameters (e.g., `max_vel_x` ↔ `acc_lim_x`). |
+| **Slow fine-tuning** | Random perturbations and global updates can require many iterations to converge. |
+
+Despite this, the method is **lightweight, derivative-free, and adaptive**, making it ideal for early-stage Sim2Real tuning when only a few parameters are optimized.

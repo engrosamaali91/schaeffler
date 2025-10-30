@@ -1,4 +1,8 @@
-# ROS2 Tutorials
+# System Architecture
+
+![](System_Architecture.png)
+
+### ROS2 Tutorials
 
 ## Driving TurtleBot via ROS2 messages [Setup link](https://docs.omniverse.nvidia.com/isaacsim/latest/ros_tutorials/tutorial_ros_drive_turtlebot.html)
 

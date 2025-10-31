@@ -1,6 +1,6 @@
 # System Architecture
 
-![](System_Architecture.png)
+![](media/System_Architecture.png)
 
 ### ROS2 Tutorials
 

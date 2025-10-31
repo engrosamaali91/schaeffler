@@ -105,3 +105,21 @@ J_tilde         = 5.77897
 ```
 
 J_tilde = 5.77897 shows a significant reduction in J_tilde after increasing the position threshold to 0.1 m and yaw to 2°, as per the Omron LD250 datasheet.
+
+
+
+### KPI Evaluation Results of pilot iteration 
+
+| Metric | Description | Value | Interpretation |
+|---------|--------------|--------|----------------|
+| **Overlap** | Common time window between real and simulated trajectories | 0.00 – 9.90 s | 10 s of overlapping data used for comparison |
+| **Sim Δx, Δy [m]** | Net displacement of simulated robot in X/Y | 2.937, −0.018 | Sim robot moved ~3 m forward |
+| **Real Δx, Δy [m]** | Net displacement of real robot in X/Y | 0.921, −0.012 | Real robot moved ~1 m forward |
+| **Samples** | Number of synchronized samples at ~10 Hz | 100 | Sufficient data for KPI computation |
+| **RMSE_pos [m]** | Root Mean Square Error of position | **2.018** | Large spatial deviation between sim and real |
+| **RMSE_psi [rad] / [deg]** | Root Mean Square Error of yaw | **0.0175 rad (≈ 1.0°)** | Good heading agreement |
+| **J_tilde** | Combined normalized KPI (≤ 1.0 = pass) | **10.34** | Fails threshold — significant sim-to-real gap in position |
+
+**Summary:**  
+Simulation shows similar heading but moves ~3× farther than the real robot, leading to a high position RMSE and large `J_tilde`.  
+Further tuning of simulated robot dynamics or control parameters is required to reduce the sim-to-real gap.

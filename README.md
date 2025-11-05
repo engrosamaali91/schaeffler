@@ -123,3 +123,41 @@ J_tilde = 5.77897 shows a significant reduction in J_tilde after increasing the 
 **Summary:**  
 Simulation shows similar heading but moves ~3× farther than the real robot, leading to a high position RMSE and large `J_tilde`.  
 Further tuning of simulated robot dynamics or control parameters is required to reduce the sim-to-real gap.
+
+
+
+## 🧠 Finding: Effect of Differential Controller Caps on Simulated AGV Dynamics
+
+### 🎯 Purpose
+To verify whether limiting **linear/angular speed** directly in **Isaac Sim’s Differential Controller Node** is necessary when **Nav2’s controller** and **velocity smoother** already enforce motion constraints.
+
+### ⚙️ Setup
+Two identical simulation runs (3 m straight-line motion) were executed:
+- **Run A – Capped:** `maxLinearSpeed`, `maxAngularSpeed`, `maxAcceleration`, `maxDeceleration` set to match the real robot (1.2 m/s, 1.047 rad/s).
+- **Run B – Uncapped:** All cap values set to `0` (disabled).
+
+Nav2 parameters and launch pipeline remained unchanged (`isaac_and_nav2.launch.py`).
+
+### 📊 Observations
+| Run | Isaac Caps | vx(t) Behavior | Notes |
+|-----|-------------|----------------|-------|
+| **A – Capped** | Enabled | Noticeable jerks / step-like peaks | Double limiting from Nav2 + Isaac caused quantization |
+| **B – Uncapped** | Disabled (`0`) | Smooth acceleration & deceleration | Nav2/velocity smoother became sole dynamic constraint |
+
+**Explanation:**  
+Isaac’s Differential Controller internal rate-limiter conflicted with Nav2’s own velocity ramping, producing overshoot and noise.  
+Removing these caps eliminates redundant constraints and yields realistic, continuous motion.
+
+### ✅ Conclusion
+> It is **not necessary to set cap values** in Isaac Sim’s *Differential Controller Node* when Nav2 already handles velocity and acceleration limits.  
+> Leave these fields at **0** or much higher than Nav2’s limits to prevent double-limiting.
+
+### 📈 Visual Evidence
+Left: *Capped (jerky profile)*  Right:  *Uncapped (smooth ramp)*
+
+![Comparison of capped vs uncapped differential controller behavior](images/before_after_cap_remove.png)
+
+### 🧩 Impact
+- Cleaner `/odom` and `/cmd_vel` traces (no artificial jerk).  
+- Simulated motion now matches the physical AGV more closely.  
+- Simplifies further Nav2 parameter tuning for minimizing the **Sim2Real Gap (J)**.

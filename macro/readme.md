@@ -11,6 +11,10 @@ These values represent the robot’s real-world position and orientation, expres
 | `th` | Robot orientation (theta / yaw) | **degrees** | radians (rad) | `th_rad = th / 1000` |
 | `upd` | Timestamp of pose update | **unix timestamp** | seconds (s) | `t_s = upd / 1000` |
 
-> **Note:**  
-> The LD-250 reports its pose in **milli-scaled SI units** for compactness.  
-> Divide each field by **1000** to convert to full SI (m, rad, s).
+
+
+`macro_setSpeeed.py` calls the macro
+
+`macro_logger` logs the data `t x y yaw v_x` after conversions
+
+`plot_robot_csv.py` do the transformation, product a plot as show in image ![plot](all_plots_combined.png) and final csv file for KPI computation 

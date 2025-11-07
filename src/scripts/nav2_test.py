@@ -36,7 +36,7 @@ def main():
 	# 5) Block until the Nav2 stack reports it is active (all lifecycle nodes activated)
 	nav.waitUntilNav2Active()
 
-	goal_pose1 = create_pose_stamped(nav, 3.00, 0.00, 0.00)
+	goal_pose1 = create_pose_stamped(nav, 5.00, 0.00, 0.00)
 	# goal_pose2 = create_pose_stamped(nav, 8.00, 3.00, 0.00	)
 	# goal_pose3 = create_pose_stamped(nav, 2.00, 3.00, 1.57)
 	

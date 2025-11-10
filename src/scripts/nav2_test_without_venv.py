@@ -54,7 +54,7 @@ def main():
     nav.waitUntilNav2Active()
 
     # 5) Define goal(s)
-    goal_pose1 = create_pose_stamped(nav, 3.00, 0.00, 0.00)
+    goal_pose1 = create_pose_stamped(nav, 5.00, 0.00, 0.00)
 
     # 6) Send as waypoints (equivalent to a single goal here)
     waypoints = [goal_pose1]

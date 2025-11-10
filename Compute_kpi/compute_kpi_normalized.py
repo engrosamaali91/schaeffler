@@ -122,26 +122,26 @@ def compute_kpis(real_df, sim_df, T_pos, T_psi):
     return rmse_pos, rmse_psi, J_tilde, hz, len(common_t)
 
 def plot_trajectories(real_df, sim_df):
-    plt.figure(figsize=(12, 8))
+    plt.figure(figsize=(12, 12))  # Adjusting the figure size to fit all 4 plots
 
-    # X
-    plt.subplot(3, 1, 1)
+    # Plot the X positions over time
+    plt.subplot(4, 1, 1)
     plt.plot(real_df["t"], real_df["x"], label="Real x")
     plt.plot(sim_df["t"], sim_df["x"], label="Sim x", linestyle="--")
     plt.ylabel("x [m]")
     plt.legend()
     plt.grid(True)
 
-    # Y
-    plt.subplot(3, 1, 2)
+    # Plot the Y positions over time
+    plt.subplot(4, 1, 2)
     plt.plot(real_df["t"], real_df["y"], label="Real y")
     plt.plot(sim_df["t"], sim_df["y"], label="Sim y", linestyle="--")
     plt.ylabel("y [m]")
     plt.legend()
     plt.grid(True)
 
-    # Yaw
-    plt.subplot(3, 1, 3)
+    # Plot the Yaw (orientation) over time
+    plt.subplot(4, 1, 3)
     plt.plot(real_df["t"], real_df["yaw"], label="Real yaw")
     plt.plot(sim_df["t"], sim_df["yaw"], label="Sim yaw", linestyle="--")
     plt.ylabel("yaw [rad]")
@@ -149,8 +149,23 @@ def plot_trajectories(real_df, sim_df):
     plt.legend()
     plt.grid(True)
 
+    # **Trajectory overlap plot**
+    plt.subplot(4, 1, 4)
+    plt.plot(real_df["x"], real_df["y"], label="Real Path", color='blue')
+    plt.plot(sim_df["x"], sim_df["y"], label="Sim Path", color='orange', linestyle='--')
+
+    # Plot settings for the trajectory plot
+    plt.title("Trajectory Overlap: Real vs Simulated Robot")
+    plt.xlabel("X [m]")
+    plt.ylabel("Y [m]")
+    plt.legend()
+    plt.grid(True)
+
+    # Adjust layout to make sure all plots fit properly
     plt.tight_layout()
     plt.show()
+
+
 
 def main():
     ap = argparse.ArgumentParser()

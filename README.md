@@ -195,3 +195,87 @@ The below image shows the inital (first iteration) effect of removing and adding
 3. Use ROS 2 controllers for trajectory refinement
 4. Consider caps as safety limits rather than optional parameters
 
+
+# Sim2Real Alignment Process
+
+## Overview
+
+This document describes the process for aligning the trajectory of a simulated robot with a real robot. The goal is to adjust simulation parameters (Isaac Sim and Nav2) such that the **simulated robot's trajectory closely matches** the real robot’s trajectory. This alignment is measured using **Root Mean Squared Error (RMSE)** in position and yaw, and a performance metric **J_tilde**.
+
+## Objective
+
+- **Align the simulated robot’s path with the real robot's path**, specifically focusing on the **x (forward)** and **y (lateral)** position, as well as the **yaw** orientation.
+- Ensure that the **RMSE** values for **position** and **yaw** are minimized, resulting in **J_tilde < 1**.
+
+## Key Steps
+
+### 1. Data Preprocessing and Alignment
+
+- **Normalize both real and simulated data**:
+  - The first step is to **normalize** the trajectories of both the real and simulated robots to a common reference frame (aligned to **(0,0)** and the initial heading of the robot).
+  - Both datasets are resampled to a common 10 Hz frequency to ensure they are comparable.
+
+### 2. Metrics Calculation
+
+- **Root Mean Squared Error (RMSE)**:
+  - The RMSE for both position (Δx, Δy) and yaw (Δψ) is computed.
+  - **Position RMSE** measures the deviation in both x and y coordinates between the real and simulated robots.
+  - **Yaw RMSE** measures the difference in orientation between the real and simulated robots.
+
+- **Performance Metric (J_tilde)**:
+  - **J_tilde** is calculated by normalizing the **RMSE values** with the threshold values for position and yaw. 
+  - Ideally, for a perfect alignment, **J_tilde should be less than 1**.
+
+### 3. Simulation Parameter Tuning
+
+- **Isaac Sim Differential Drive Cap**:
+  - The **maxWheelSpeed** parameter in Isaac Sim was adjusted to slow down the simulated robot and bring its trajectory closer to that of the real robot.
+  - A comparison of the robot’s trajectory with **maxWheelSpeed** set to **1.2** and **0.5** showed improvement in the alignment, with **J_tilde dropping from 13.83 to 7.07**.
+
+### 4. Result Evaluation
+
+- After adjusting the simulation parameters, the **Δx** and **Δy** values for the real and simulated robots were compared.
+  - **Δx** and **Δy** are the total distance traveled in the x and y directions, respectively.
+  - **J_tilde** provides an overall performance measure of alignment, where values below **1.0** indicate good alignment.
+
+### 5. Observations and Future Steps
+
+- **Findings:**
+  - By limiting the **maxWheelSpeed** in Isaac Sim, we were able to slow down the simulated robot, leading to a **better alignment with the real robot** (as shown by the improved **J_tilde** value).
+  
+- **Next Steps:**
+  - **Fine-tune the Nav2 parameters** (e.g., `max_vel_x`, `acc_lim_x`, `decel_lim_x`) to refine the simulation’s behavior.
+  - Compare the **velocity profiles** (vx) alongside the position and yaw for a more comprehensive alignment.
+  - Use **advanced Nav2 parameters** (such as **`velocity_smoother`**) to improve trajectory smoothing and overall control.
+
+---
+
+## Visualizations
+
+Below are the plots showing the **before** and **after** results of the alignment process:
+
+- **Before Parameter Adjustment:**
+
+  ![Before](images/itr_2_5m/overlap_plot_before.png)  
+  *[isaac sim with 1.2m/s cap value]*
+
+- **After Parameter Adjustment:**
+
+  ![After](images/itr_2_5m/overlap_plot_after.png)  
+  *[isaac sim with 0.5m/s vap value]*
+
+---
+
+## Iterations Summary
+
+| Iteration | Max Wheel Speed | J_tilde | RMSE_pos [m] | RMSE_psi [rad] | Time Window | 
+|-----------|-----------------|---------|--------------|----------------|-------------|
+| 1         | 1.2             | 13.83   | 2.69         | 0.02463        | 0–4.80 s    | 
+| 2         | 0.5             | 7.07    | 1.33         | 0.02893        | 0–10.10 s   |
+
+---
+
+## Conclusion
+
+This process outlines the necessary steps to align the simulated robot with the real robot. By adjusting the simulation parameters and comparing the RMSE values, we can achieve better alignment, which is essential for accurate testing and evaluation in simulation environments. Future improvements will include refining control parameters and further reducing the discrepancies in the simulated robot’s trajectory.
+

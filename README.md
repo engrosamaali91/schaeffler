@@ -129,35 +129,69 @@ Further tuning of simulated robot dynamics or control parameters is required to 
 ## 🧠 Finding: Effect of Differential Controller Caps on Simulated AGV Dynamics
 
 ### 🎯 Purpose
-To verify whether limiting **linear/angular speed** directly in **Isaac Sim’s Differential Controller Node** is necessary when **Nav2’s controller** and **velocity smoother** already enforce motion constraints.
+To investigate the impact of **Isaac Sim's Differential Controller Node** caps on robot stability and control, particularly in relation to wheel joint damping and velocity control.
 
-### ⚙️ Setup
-Two identical simulation runs (3 m straight-line motion) were executed:
-- **Run A – Capped:** `maxLinearSpeed`, `maxAngularSpeed`, `maxAcceleration`, `maxDeceleration` set to match the real robot (1.2 m/s, 1.047 rad/s).
-- **Run B – Uncapped:** All cap values set to `0` (disabled).
+### ⚙️ Setup & Iterations
+1. **Initial Setup (With Caps)**
+   - `maxLinearSpeed`: 1.2 m/s
+   - `maxAngularSpeed`: 1.047 rad/s
+   - Wheel joint damping: default values
+   - Result: Stable motion with predictable behavior
 
-Nav2 parameters and launch pipeline remained unchanged (`isaac_and_nav2.launch.py`).
+2. **Removed Caps**
+   - All cap values set to `0`
+   - Initial wheel joint damping: 1e-9
+   - Result: Loss of control, particularly in angular motion
 
-### 📊 Observations
-| Run | Isaac Caps | vx(t) Behavior | Notes |
-|-----|-------------|----------------|-------|
-| **A – Capped** | Enabled | Noticeable jerks / step-like peaks | Double limiting from Nav2 + Isaac caused quantization |
-| **B – Uncapped** | Disabled (`0`) | Smooth acceleration & deceleration | Nav2/velocity smoother became sole dynamic constraint |
+3. **Damping Adjustment Attempts**
+   - Tested damping range: 1e-9 to 1e-4
+   - Result: Persistent control issues:
+     - Poor angular control
+     - Delayed stopping response
+     - Robot continued moving even without velocity commands
 
-**Explanation:**  
-Isaac’s Differential Controller internal rate-limiter conflicted with Nav2’s own velocity ramping, producing overshoot and noise.  
-Removing these caps eliminates redundant constraints and yields realistic, continuous motion.
+4. **Final Configuration (Restored Caps)**
+   - Restored original cap values
+   - Result: Regained stability and control
 
-### ✅ Conclusion
-> It is **not necessary to set cap values** in Isaac Sim’s *Differential Controller Node* when Nav2 already handles velocity and acceleration limits.  
-> Leave these fields at **0** or much higher than Nav2’s limits to prevent double-limiting.
+### 📊 Key Observations
+| Configuration | Behavior | Control Response | Stability |
+|--------------|----------|------------------|-----------|
+| **With Caps** | Predictable motion | Immediate stop response | High stability |
+| **No Caps** | Erratic movement | Delayed stopping | Poor stability |
+| **No Caps + Adjusted Damping** | Improved but still unstable | Inconsistent response | Medium-low stability |
 
-### 📈 Visual Evidence
-Left: *Capped (jerky profile)*  Right:  *Uncapped (smooth ramp)*
 
+The below image shows the inital (first iteration) effect of removing and adding cap values
 ![Comparison of capped vs uncapped differential controller behavior](images/before_after_cap_remove.png)
 
-### 🧩 Impact
-- Cleaner `/odom` and `/cmd_vel` traces (no artificial jerk).  
-- Simulated motion now matches the physical AGV more closely.  
-- Simplifies further Nav2 parameter tuning for minimizing the **Sim2Real Gap (J)**.
+
+### ⚠️ Critical Findings
+1. **Cap Values are Essential:**
+   - Despite being optional parameters, caps play a crucial role in maintaining simulation stability
+   - They provide an additional layer of control that complements ROS 2 controllers
+
+2. **Damping Sensitivity:**
+   - Robot's behavior is highly sensitive to wheel joint damping values
+   - Removing caps exposed underlying stability issues that damping adjustments couldn't fully resolve
+
+3. **Control Hierarchy:**
+   - Isaac Sim's caps provide a fundamental control envelope
+   - ROS 2 controllers work best within this envelope rather than as the sole control mechanism
+
+### ✅ Conclusion
+> **Cap values in Isaac Sim's Differential Controller Node should be maintained** for optimal stability and control.
+> While theoretically optional, they provide essential boundaries for realistic robot behavior and stable simulation.
+
+### 🔍 Technical Implications
+- Keep caps matched to real robot specifications (1.2 m/s, 1.047 rad/s)
+- Consider caps as part of the core simulation configuration
+- Use ROS 2 controllers for fine-tuning within these boundaries
+- Monitor joint damping values but prioritize cap settings for stability
+
+### 🛠️ Best Practices
+1. Start with manufacturer-specified cap values
+2. Maintain caps even when using ROS 2 controllers
+3. Use ROS 2 controllers for trajectory refinement
+4. Consider caps as safety limits rather than optional parameters
+

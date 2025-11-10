@@ -114,10 +114,10 @@ def compute_kpis(real_df, sim_df, T_pos, T_psi):
     J_tilde = float(np.mean([rmse_pos / T_pos, rmse_psi / T_psi]))
 
     #Sanity check
+    # Sanity check with delta yaw (Δyaw)
     print(f"[overlap] t ∈ [{common_t[0]:.2f}, {common_t[-1]:.2f}] s")
-    print(f"  sim Δx={sim_i['x'].iloc[-1]-sim_i['x'].iloc[0]:.3f}, Δy={sim_i['y'].iloc[-1]-sim_i['y'].iloc[0]:.3f}")
-    print(f"  realΔx={real_i['x'].iloc[-1]-real_i['x'].iloc[0]:.3f}, Δy={real_i['y'].iloc[-1]-real_i['y'].iloc[0]:.3f}")
-
+    print(f"  sim Δx={sim_i['x'].iloc[-1]-sim_i['x'].iloc[0]:.3f}, Δy={sim_i['y'].iloc[-1]-sim_i['y'].iloc[0]:.3f}, Δyaw={angle_wrap_diff(sim_i['yaw'].iloc[-1], sim_i['yaw'].iloc[0]):.3f}")
+    print(f"  real Δx={real_i['x'].iloc[-1]-real_i['x'].iloc[0]:.3f}, Δy={real_i['y'].iloc[-1]-real_i['y'].iloc[0]:.3f}, Δyaw={angle_wrap_diff(real_i['yaw'].iloc[-1], real_i['yaw'].iloc[0]):.3f}")
 
     return rmse_pos, rmse_psi, J_tilde, hz, len(common_t)
 

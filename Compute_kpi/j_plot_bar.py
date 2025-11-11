@@ -3,8 +3,7 @@ import matplotlib.pyplot as plt
 # Example J_tilde values and corresponding tuning parameters for each iteration
 iterations = [1, 2, 3]
 j_tilde_values = [45.53, 13.83, 7.07]
-max_vel_x_values = [1.2, 1.2, 0.5]
-acc_lim_x_values = [2.5, 2.5, 2.5]
+isaac_max_vel_x_values = [1.2, 1.2, 0.5]
 pos_th = [0.03, 0.1, 0.1]
 pos_psi = [0.02, 0.0349, 0.0349]
 # Bar plot for J_tilde over iterations
@@ -24,7 +23,7 @@ for i, bar in enumerate(bars):
     height = bar.get_height()
     
     # Format the text with multiple parameters inside the bar
-    text = f"max_vel_x={max_vel_x_values[i]:.2f}\nacc_lim_x={acc_lim_x_values[i]:.2f}\npos_th={pos_th[i]:.2f}\nyaw_th={pos_psi[i]:.3f}"
+    text = f"isaac_max_vel_x={isaac_max_vel_x_values[i]:.2f}\npos_th={pos_th[i]:.2f}\nyaw_th={pos_psi[i]:.3f}"
 
     # Place the text inside the bar
     plt.text(bar.get_x() + bar.get_width() / 2, height / 2,  # X position (center of the bar), Y position (middle of the bar)
@@ -32,5 +31,6 @@ for i, bar in enumerate(bars):
              ha='center', va='center', fontsize=10, color='white')
 
 # Show the plot
+plt.title("J_tilde over Iterations with Parameter Changes")
 plt.tight_layout()
 plt.show()

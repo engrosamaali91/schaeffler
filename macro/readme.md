@@ -18,3 +18,16 @@ These values represent the robot’s real-world position and orientation, expres
 `macro_logger` logs the data `t x y yaw v_x` after conversions
 
 `plot_robot_csv.py` do the transformation, product a plot as show in image ![plot](all_plots_combined.png) and final csv file for KPI computation 
+
+
+# Default configuration of Omron 
+The macro is used to temporarily change the speed of the robot for a robot run.
+During the data acquisition phase, the robot was moved with different configuration values. The changes were temporarily reflected on the real robot.
+For example the robot was moved with 100mm/s speed in a straight line. as shown in the image below:
+ 
+![macro_move](macrovalues.png)
+
+
+
+![Robot configuration](robot_config.png)
+

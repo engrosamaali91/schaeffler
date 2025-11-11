@@ -268,15 +268,36 @@ Below are the plots showing the **before** and **after** results of the alignmen
 
 ## Iterations Summary
 
-| Iteration | Max Wheel Speed | J_tilde | RMSE_pos [m] | RMSE_psi [rad] | Time Window | 
-|-----------|-----------------|---------|--------------|----------------|-------------|
-| 1         | 1.2             | 45.53   | 2.69         | 0.02463        | 0-4.80 s    |
-| 2         | 1.2             | 13.83   | 2.69         | 0.02463        | 0-4.80 s    | 
-| 3         | 0.5             | 7.07    | 1.33         | 0.02893        | 0–10.10 s   |
+| Iteration | Isaac Max linear speed| Isaac Max ang speed| J_tilde | RMSE_pos [m] | RMSE_psi [rad] | Time Window | 
+|-----------|-----------------------|-------------|------|--------------|----------------|-------------|
+| 1         | 1.2                   |1.0472                    | 45.53   | 2.69         | 0.02463        | 0-4.80 s    |
+| 2         | 1.2                   |1.0472                    |13.83   | 2.69         | 0.02463        | 0-4.80 s    | 
+| 3         | 0.5                   |1.0472                    |7.07    | 1.33         | 0.02893        | 0–10.10 s   |
+| 4         | 0.5                   |1.0472                    |6.63    | 1.26         | 0.02069        | 0-11.20 s   | 
 
 ---
 
 ## Conclusion
 
 This process outlines the necessary steps to align the simulated robot with the real robot. By adjusting the simulation parameters and comparing the RMSE values, we can achieve better alignment, which is essential for accurate testing and evaluation in simulation environments. Future improvements will include refining control parameters and further reducing the discrepancies in the simulated robot’s trajectory.
+
+
+
+## Manual check
+J value is 6.63654
+
+
+```bash
+# Controller Server
+ros2 param set /controller_server "FollowPath.max_vel_x" 0.2
+ros2 param set /controller_server "FollowPath.max_speed_xy" 0.2
+ros2 param set /controller_server "FollowPath.acc_lim_x" 2.0
+ros2 param set /controller_server "FollowPath.decel_lim_x" -2.0
+
+# Velocity Smoother
+ros2 param set /velocity_smoother max_velocity '[0.2, 0.0, 1.0]'
+ros2 param set /velocity_smoother min_velocity '[-0.2, 0.0, -1.0]'
+ros2 param set /velocity_smoother max_accel '[2.0, 0.0, 3.2]'
+ros2 param set /velocity_smoother max_decel '[-2.0, 0.0, -3.2]'
+```
 

@@ -285,7 +285,12 @@ This process outlines the necessary steps to align the simulated robot with the 
 
 ## Manual check
 J value is 6.63654
-
+[overlap] t ∈ [0.00, 11.20] s
+sim Δx=4.857, Δy=0.001, Δyaw=0.033
+real Δx=4.232, Δy=0.005, Δyaw=0.000
+Samples: 113 @ ~10.0 Hz
+RMSE_pos  [m]  = 1.26803
+RMSE_psi  [rad] = 0.02069  [deg] = 1.18530
 
 ```bash
 # Controller Server

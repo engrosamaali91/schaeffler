@@ -80,7 +80,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--in", dest="input_csv", default="odom_data_new.csv")
     ap.add_argument("--out", dest="output_csv", default="odom_for_kpi.csv")
-    ap.add_argument("--goal-x", type=float, default=3.0) # the goal coordinates to compare against.
+    ap.add_argument("--goal-x", type=float, default=5.0) # the goal coordinates to compare against.
     ap.add_argument("--goal-y", type=float, default=0.0) # the goal coordinates to compare against.
     ap.add_argument("--vx-th", type=float, default=0.01) # the threshold for velocity to detect if the robot is moving.
     ap.add_argument("--goal-tol", type=float, default=0.05) #tolerance for proximity to the goal.

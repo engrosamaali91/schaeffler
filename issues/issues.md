@@ -50,4 +50,5 @@ Referring to
 
 ## ✅ Potential Solution
 
-The differential drive controller in isaac sim expects the value unscaled from ros2 subscriber node. To get the exact velocities mapped on the simulated robot, remove the to_scale node from the default differential drive action graph.
+The differential drive controller in isaac sim expects the value unscaled from ros2 subscriber node. To get the exact velocities mapped on the simulated robot, remove the to_scale node from the default differential drive action graph......
+

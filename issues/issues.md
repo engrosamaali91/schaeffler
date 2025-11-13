@@ -38,3 +38,16 @@ A configuration in Isaac Sim that allows the `maxLinearSpeed` and `maxAngularSpe
 The full discussion and context for this issue can be found on the NVIDIA Developer Forums:
 
 [Isaac Sim ROS 2 Diff Drive Tuning: Conflict between High Damping (Stability) and Low Damping (Responsiveness)](https://forums.developer.nvidia.com/t/isaac-sim-ros-2-diff-drive-tuning-conflict-between-high-damping-stability-and-low-damping-responsiveness/351293)
+
+
+
+Referring to 
+
+[Tuning Joint Drive Gainsation](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/robot_setup/joint_tuning.html)
+
+[Tuning guide](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/robot_setup/ext_isaacsim_robot_setup_gain_tuner.html)
+
+
+## ✅ Potential Solution
+
+The differential drive controller in isaac sim expects the value unscaled from ros2 subscriber node. To get the exact velocities mapped on the simulated robot, remove the to_scale node from the default differential drive action graph.

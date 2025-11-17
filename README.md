@@ -274,6 +274,7 @@ Below are the plots showing the **before** and **after** results of the alignmen
 | 2         | 1.2                   |1.0472                    |13.83   | 2.69         | 0.02463        | 0-4.80 s    | 
 | 3         | 0.5                   |1.0472                    |7.07    | 1.33         | 0.02893        | 0–10.10 s   |
 | 4         | 0.5                   |1.0472                    |6.63    | 1.26         | 0.02069        | 0-11.20 s   | 
+| 5         | 0.0                   |0.0000                    |6.13    | 1.18         | 0.01487        | 0-14.20
 
 ---
 
@@ -306,3 +307,23 @@ ros2 param set /velocity_smoother max_accel '[2.0, 0.0, 3.2]'
 ros2 param set /velocity_smoother max_decel '[-2.0, 0.0, -3.2]'
 ```
 
+---
+
+## Iteration 5 — Removing DCN Cap Values
+
+After removing DCN caps, input command velocities match odom output more closely.
+
+Before / After image:
+> After
+![DCN cap vals removed](images/itr_3_5m_without_DCN_cap/After.png)
+
+Overlap plot (iteration 5) — ROS params now influence behavior:
+![overlap iteration 5](images/itr_3_5m_without_DCN_cap/overlap.png)
+
+Notes:
+- Input velocity = 0.2 m/s
+- Input acceleration = _ m/s²
+
+This iteration demonstrates the effect of removing DCN caps so that only ROS 2 controller parameters shape robot motion. 
+
+> With that the earlier assumption is no longer valid i.e to maintain the DCN cap vals

@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 
 # Example J_tilde values and corresponding tuning parameters for each iteration
-iterations = [1, 2, 3]
-j_tilde_values = [45.53, 13.83, 7.07]
-isaac_max_vel_x_values = [1.2, 1.2, 0.5]
-pos_th = [0.03, 0.1, 0.1]
-pos_psi = [0.02, 0.0349, 0.0349]
+iterations = [1, 2, 3,4,5]
+j_tilde_values = [45.53, 13.83, 7.07,6.63,2.5]
+isaac_max_vel_x_values = [1.2, 1.2, 0.5,0.0 ,0.0]
+pos_th = [0.03, 0.1, 0.1,0.1,0.1 ]
+pos_psi = [0.02, 0.0349, 0.0349,0.0349,0.0349 ]
 # Bar plot for J_tilde over iterations
 plt.figure(figsize=(10, 6))
 bars = plt.bar(iterations, j_tilde_values, color='skyblue')

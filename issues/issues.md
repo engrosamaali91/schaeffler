@@ -48,7 +48,7 @@ Referring to
 [Tuning guide](https://docs.isaacsim.omniverse.nvidia.com/4.5.0/robot_setup/ext_isaacsim_robot_setup_gain_tuner.html)
 
 
-## ✅ Potential Solution
+## ✅ Solution
 
 The differential drive controller in isaac sim expects the value unscaled from ros2 subscriber node. To get the exact velocities mapped on the simulated robot, remove the to_scale node from the default differential drive action graph......
 

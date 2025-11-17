@@ -268,15 +268,20 @@ Below are the plots showing the **before** and **after** results of the alignmen
 
 ## Iterations Summary
 
-| Iteration | Isaac Max linear speed| Isaac Max ang speed| J_tilde | RMSE_pos [m] | RMSE_psi [rad] | Time Window | 
-|-----------|-----------------------|-------------|------|--------------|----------------|-------------|
-| 1         | 1.2                   |1.0472                    | 45.53   | 2.69         | 0.02463        | 0-4.80 s    |
-| 2         | 1.2                   |1.0472                    |13.83   | 2.69         | 0.02463        | 0-4.80 s    | 
-| 3         | 0.5                   |1.0472                    |7.07    | 1.33         | 0.02893        | 0–10.10 s   |
-| 4         | 0.5                   |1.0472                    |6.63    | 1.26         | 0.02069        | 0-11.20 s   | 
-| 5         | 0.0                   |0.0000                    |6.13    | 1.18         | 0.01487        | 0-14.20
 
----
+
+
+| Iteration | Isaac Max linear speed | Isaac Max ang speed | **ROS max_vel_x** | **ROS max_acc** | J_tilde | RMSE_pos [m] | RMSE_psi [rad] | Time Window |
+| --------- | ---------------------- | ------------------- | ----------------- | --------------- | ------- | ------------ | -------------- | ----------- |
+| 1         | 1.2                    | 1.0472              | (no effect)       | (no effect)     | 45.53   | 2.69         | 0.02463        | 0–4.80 s    |
+| 2         | 1.2                    | 1.0472              | (no effect)       | (no effect)     | 13.83   | 2.69         | 0.02463        | 0–4.80 s    |
+| 3         | 0.5                    | 1.0472              | (no effect)       | (no effect)     | 7.07    | 1.33         | 0.02893        | 0–10.10 s   |
+| 4         | 0.5                    | 1.0472              | (no effect)       | (no effect)     | 6.63    | 1.26         | 0.02069        | 0–11.20 s   |
+| **5**     |**0.0**                 | **0.0000**          | **0.2**           | **0.2**         | **6.13**| **1.18**     | **0.01487**    |**0–14.20 s**|
+| 6         | 0.0                    | 0.0000              | 0.4               | 0.4             | 2.5     | 0.43         | 0.02258        | 0–12.20 s   |
+
+
+> ***ROS parameters had no influence during Iterations 1–4 as Isaac Sim caps dominated the motion.***
 
 ## Conclusion
 
@@ -327,3 +332,15 @@ Notes:
 This iteration demonstrates the effect of removing DCN caps so that only ROS 2 controller parameters shape robot motion. 
 
 > With that the earlier assumption is no longer valid i.e to maintain the DCN cap vals
+ 
+
+## Iteration 6 — Increasing ROS Velocity to Match Real Robot
+
+After validating that removing DCN cap values allowed ROS 2 controller parameters to take full effect, the linear velocity and acceleration limits were increased to better match the real robot’s observed velocity (~0.6 m/s).
+
+![](images/itr_4_5m_without_DCN_cap/ros_set.png)
+
+Overlap plot (iteration 6) — improved alignment with real robot trajectory:
+![](images/itr_4_5m_without_DCN_cap/overlap.png)
+
+

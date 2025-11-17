@@ -163,7 +163,7 @@ def plot_trajectories(real_df, sim_df):
     plt.plot(sim_df["x"], sim_df["y"], label="Sim Path", color='orange', linestyle='--')
 
     # Plot settings for the trajectory plot
-    plt.title("Trajectory Overlap: Real vs Simulated Robot")
+    plt.title("Trajectory Overlap")
     plt.xlabel("X [m]")
     plt.ylabel("Y [m]")
     plt.legend()

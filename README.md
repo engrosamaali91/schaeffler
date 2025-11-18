@@ -279,6 +279,7 @@ Below are the plots showing the **before** and **after** results of the alignmen
 | 4         | 0.5                    | 1.0472              | (no effect)       | (no effect)     | 6.63    | 1.26         | 0.02069        | 0–11.20 s   |
 | **5**     |**0.0**                 | **0.0000**          | **0.2**           | **0.2**         | **6.13**| **1.18**     | **0.01487**    |**0–14.20 s**|
 | 6         | 0.0                    | 0.0000              | 0.4               | 0.2             | 2.5     | 0.43         | 0.02258        | 0–12.20 s   |
+| 7         | 0.0                    | 0.0000              | 0.4               | 0.1             | 1.1     | 0.18         | 0.01160        | 0-14.20     |
 
 
 > ***ROS parameters had no influence during Iterations 1–4 as Isaac Sim caps dominated the motion.***
@@ -327,7 +328,7 @@ Overlap plot (iteration 5) — ROS params now influence behavior:
 
 Notes:
 - Input velocity = 0.2 m/s
-- Input acceleration = _ m/s²
+- Input acceleration = 0.4 m/s²
 
 This iteration demonstrates the effect of removing DCN caps so that only ROS 2 controller parameters shape robot motion. 
 
@@ -344,3 +345,37 @@ Overlap plot (iteration 6) — improved alignment with real robot trajectory:
 ![](images/itr_4_5m_without_DCN_cap/overlap.png)
 
 
+
+
+
+## Iteration 7
+
+In this iteration we reduced the acceleration by 50% while keeping the linear velocity unchanged.
+
+Notes:
+- Input velocity: 0.4 m/s
+- Input acceleration: 0.1 m/s²
+
+![](images/itr_5_5m_without_DCN_cap/ros_set.png)
+
+Overlap plot — improved alignment with the real robot trajectory:
+![](images/itr_5_5m_without_DCN_cap/overlap.png)
+
+Overlap window: t ∈ [0.00, 14.20] s
+
+Simulation results (overlap window):
+- sim Δx = 5.224 m, Δy = 0.014 m, Δyaw = 0.001 rad
+- real Δx = 5.073 m, Δy = 0.006 m, Δyaw = 0.000 rad
+- Samples: 143 @ ~10.0 Hz
+
+KPIs:
+- RMSE_pos [m] = 0.18846
+- RMSE_psi [rad] = 0.01160 (≈ 0.6646°)
+- J_tilde = 1.10846 (note: J_tilde ≤ 1.0 meets the pass threshold)
+
+Discussion
+:
+Reducing acceleration while keeping the same cruise velocity increased the duration of the maneuver (overlap time = 14.20 s). The overlap plot shows this effect. Importantly, this iteration demonstrates that, after removing DCN caps, ROS controller parameters (velocity and acceleration limits) influence simulated motion. By tuning these ROS parameters — manually or automatically — the simulated robot's behavior can be brought closer to the real robot's trajectory.
+
+### J-plot:
+![J plot](images/J_plot.png)

@@ -278,7 +278,7 @@ Below are the plots showing the **before** and **after** results of the alignmen
 | 3         | 0.5                    | 1.0472              | (no effect)       | (no effect)     | 7.07    | 1.33         | 0.02893        | 0–10.10 s   |
 | 4         | 0.5                    | 1.0472              | (no effect)       | (no effect)     | 6.63    | 1.26         | 0.02069        | 0–11.20 s   |
 | **5**     |**0.0**                 | **0.0000**          | **0.2**           | **0.2**         | **6.13**| **1.18**     | **0.01487**    |**0–14.20 s**|
-| 6         | 0.0                    | 0.0000              | 0.4               | 0.4             | 2.5     | 0.43         | 0.02258        | 0–12.20 s   |
+| 6         | 0.0                    | 0.0000              | 0.4               | 0.2             | 2.5     | 0.43         | 0.02258        | 0–12.20 s   |
 
 
 > ***ROS parameters had no influence during Iterations 1–4 as Isaac Sim caps dominated the motion.***

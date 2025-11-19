@@ -8,6 +8,8 @@ import time
 import os
 import rclpy
 from rclpy.node import Node as RclNode  # just for typing hints if needed
+import glob
+import re
 
 from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
 from geometry_msgs.msg import PoseStamped
@@ -55,7 +57,7 @@ def create_pose_stamped(navigator: BasicNavigator, position_x: float, position_y
 class OdomCsvRecorder:
     """Record `/odom` to CSV while `recording` is True.
 
-    Writes rows: t, x, y, yaw (t = seconds since first recorded odom message).
+    Writes rows: t, x, y, yaw, vx (t = seconds since first recorded odom message).
     Designed to start after the goal is sent and stop when the task completes.
     """
 
@@ -88,9 +90,10 @@ class OdomCsvRecorder:
             y = msg.pose.pose.position.y
             q = msg.pose.pose.orientation
             yaw = yaw_from_quat(q.x, q.y, q.z, q.w)
-            # write row
+            vx = msg.twist.twist.linear.x
+            # write row including vx
             try:
-                self._writer.writerow([f"{t:.6f}", f"{x:.6f}", f"{y:.6f}", f"{yaw:.6f}"])
+                self._writer.writerow([f"{t:.6f}", f"{x:.6f}", f"{y:.6f}", f"{yaw:.6f}", f"{vx:.6f}"])
             except Exception:
                 # swallow I/O errors to avoid crashing nav loop; user can check file later
                 pass
@@ -106,10 +109,10 @@ class OdomCsvRecorder:
         # create node and subscription
         self.node = rclpy.create_node('nav2_odom_csv_recorder')
         self.sub = self.node.create_subscription(Odometry, '/odom', self._odom_callback, 10)
-        # open file and csv writer
+        # open file and csv writer (include vx column)
         self._file = open(self.filename, 'w', newline='')
         self._writer = csv.writer(self._file)
-        self._writer.writerow(['t', 'x', 'y', 'yaw'])
+        self._writer.writerow(['t', 'x', 'y', 'yaw', 'vx'])
 
     def start_recording(self):
         with self._lock:
@@ -171,7 +174,26 @@ def main():
     nav.waitUntilNav2Active()
 
     # prepare CSV recorder but don't start recording until goal is sent
-    recorder = OdomCsvRecorder(filename='logs/nav2_odom_record.csv')
+    # create a new run file each time: logs/nav2_run_1.csv, nav2_run_2.csv, ...
+    def _next_run_filename(dirpath: str = 'logs', prefix: str = 'nav2_run_', ext: str = '.csv') -> str:
+        os.makedirs(dirpath, exist_ok=True)
+        pattern = os.path.join(dirpath, f"{prefix}*{ext}")
+        files = glob.glob(pattern)
+        maxn = 0
+        for f in files:
+            bn = os.path.basename(f)
+            m = re.match(rf"{re.escape(prefix)}(\d+){re.escape(ext)}$", bn)
+            if m:
+                try:
+                    n = int(m.group(1))
+                    if n > maxn:
+                        maxn = n
+                except ValueError:
+                    pass
+        return os.path.join(dirpath, f"{prefix}{maxn+1}{ext}")
+
+    run_filename = _next_run_filename()
+    recorder = OdomCsvRecorder(filename=run_filename)
     recorder.start()
 
     try:
@@ -195,7 +217,7 @@ def main():
             time.sleep(0.02)
 
 
-        grace_sec = 0.5   # 0.5–1.0 s is usually enough
+        grace_sec = 1.0   # 0.5–1.0 s is usually enough
         end_t = time.time() + grace_sec
         while time.time() < end_t:
             recorder.spin_once(timeout=0.05)   # if your recorder uses spin_once

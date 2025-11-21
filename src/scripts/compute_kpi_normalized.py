@@ -34,7 +34,7 @@ import argparse
 from pathlib import Path
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import math
 
 
@@ -146,59 +146,59 @@ def compute_kpis(real_df, sim_df, T_pos, T_psi):
 
     return rmse_pos, rmse_psi, J_tilde, hz, len(common_t)
 
-def plot_trajectories(real_df, sim_df):
-    plt.figure(figsize=(12, 16))  # Adjusting the figure size to fit all 5 plots
+# def plot_trajectories(real_df, sim_df):
+#     plt.figure(figsize=(12, 16))  # Adjusting the figure size to fit all 5 plots
 
-    # Plot the velocity in x (vx) over time (1st plot)
-    plt.subplot(5, 1, 1)
-    if "vx" in real_df.columns:
-        plt.plot(real_df["t"], real_df["vx"], label="Real vx")
-    if "vx" in sim_df.columns:
-        plt.plot(sim_df["t"], sim_df["vx"], label="Sim vx", linestyle="--")
-    plt.ylabel("vx [m/s]")
-    plt.legend()
-    plt.grid(True)
+#     # Plot the velocity in x (vx) over time (1st plot)
+#     plt.subplot(5, 1, 1)
+#     if "vx" in real_df.columns:
+#         plt.plot(real_df["t"], real_df["vx"], label="Real vx")
+#     if "vx" in sim_df.columns:
+#         plt.plot(sim_df["t"], sim_df["vx"], label="Sim vx", linestyle="--")
+#     plt.ylabel("vx [m/s]")
+#     plt.legend()
+#     plt.grid(True)
 
-    # Plot the X positions over time (2nd plot)
-    plt.subplot(5, 1, 2)
-    plt.plot(real_df["t"], real_df["x"], label="Real x")
-    plt.plot(sim_df["t"], sim_df["x"], label="Sim x", linestyle="--")
-    plt.ylabel("x [m]")
-    plt.legend()
-    plt.grid(True)
+#     # Plot the X positions over time (2nd plot)
+#     plt.subplot(5, 1, 2)
+#     plt.plot(real_df["t"], real_df["x"], label="Real x")
+#     plt.plot(sim_df["t"], sim_df["x"], label="Sim x", linestyle="--")
+#     plt.ylabel("x [m]")
+#     plt.legend()
+#     plt.grid(True)
 
-    # Plot the Y positions over time (3rd plot)
-    plt.subplot(5, 1, 3)
-    plt.plot(real_df["t"], real_df["y"], label="Real y")
-    plt.plot(sim_df["t"], sim_df["y"], label="Sim y", linestyle="--")
-    plt.ylabel("y [m]")
-    plt.legend()
-    plt.grid(True)
+#     # Plot the Y positions over time (3rd plot)
+#     plt.subplot(5, 1, 3)
+#     plt.plot(real_df["t"], real_df["y"], label="Real y")
+#     plt.plot(sim_df["t"], sim_df["y"], label="Sim y", linestyle="--")
+#     plt.ylabel("y [m]")
+#     plt.legend()
+#     plt.grid(True)
 
-    # Plot the Yaw (orientation) over time (4th plot)
-    plt.subplot(5, 1, 4)
-    plt.plot(real_df["t"], real_df["yaw"], label="Real yaw")
-    plt.plot(sim_df["t"], sim_df["yaw"], label="Sim yaw", linestyle="--")
-    plt.ylabel("yaw [rad]")
-    plt.xlabel("time [s]")
-    plt.legend()
-    plt.grid(True)
+#     # Plot the Yaw (orientation) over time (4th plot)
+#     plt.subplot(5, 1, 4)
+#     plt.plot(real_df["t"], real_df["yaw"], label="Real yaw")
+#     plt.plot(sim_df["t"], sim_df["yaw"], label="Sim yaw", linestyle="--")
+#     plt.ylabel("yaw [rad]")
+#     plt.xlabel("time [s]")
+#     plt.legend()
+#     plt.grid(True)
 
-    # **Trajectory overlap plot** (5th plot)
-    plt.subplot(5, 1, 5)
-    plt.plot(real_df["x"], real_df["y"], label="Real Path")
-    plt.plot(sim_df["x"], sim_df["y"], label="Sim Path", linestyle="--")
+#     # **Trajectory overlap plot** (5th plot)
+#     plt.subplot(5, 1, 5)
+#     plt.plot(real_df["x"], real_df["y"], label="Real Path")
+#     plt.plot(sim_df["x"], sim_df["y"], label="Sim Path", linestyle="--")
 
-    # Plot settings for the trajectory plot
-    plt.title("Trajectory Overlap")
-    plt.xlabel("X [m]")
-    plt.ylabel("Y [m]")
-    plt.legend()
-    plt.grid(True)
+#     # Plot settings for the trajectory plot
+#     plt.title("Trajectory Overlap")
+#     plt.xlabel("X [m]")
+#     plt.ylabel("Y [m]")
+#     plt.legend()
+#     plt.grid(True)
 
-    # Adjust layout to make sure all plots fit properly
-    plt.tight_layout()
-    plt.show()
+#     # Adjust layout to make sure all plots fit properly
+#     plt.tight_layout()
+#     plt.show()
 
 
 # ---------------------------------------------------------------------------
@@ -304,7 +304,7 @@ def main():
     print(f"J_tilde          = {J_tilde:.5f} (<= 1.0 passes all thresholds on average)")
 
     # Plot normalized trajectories (so you can visually confirm alignment)
-    plot_trajectories(real_df, sim_df)
+    # plot_trajectories(real_df, sim_df)
 
 
 if __name__ == "__main__":

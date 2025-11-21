@@ -14,8 +14,15 @@ install(DIRECTORY rviz/
 )
 
 # Install Python execs into lib/${PROJECT_NAME} so launch can run them
-install(PROGRAMS scripts/nav2_test.py
+install(PROGRAMS 
+  scripts/nav2_test.py
   DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install compute_kpi_normalized.py into share/${PROJECT_NAME}/scripts
+install(DIRECTORY scripts/
+  DESTINATION share/${PROJECT_NAME}/scripts
+  FILES_MATCHING PATTERN "*.py"
 )
 
 

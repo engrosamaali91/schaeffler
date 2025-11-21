@@ -1,12 +1,13 @@
 # isaac_and_nav2.launch.py
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction, RegisterEventHandler, ExecuteProcess
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 from launch.conditions import IfCondition
+from launch.event_handlers import OnProcessExit
 
 def generate_launch_description():
     usd_path = LaunchConfiguration("usd_path")
@@ -16,6 +17,8 @@ def generate_launch_description():
     rviz = LaunchConfiguration("rviz")                 
     rviz_config = LaunchConfiguration("rviz_config")   
     run_test = LaunchConfiguration("run_test")
+    compute_kpi = LaunchConfiguration("compute_kpi")
+    compute_kpi_script = LaunchConfiguration("compute_kpi_script")
 
     # package shares
     nav_bringup_share = FindPackageShare("nav_bringup")
@@ -58,6 +61,11 @@ def generate_launch_description():
     "run_test",
     default_value="false",
     description="Run nav2_test.py after Nav2 is active (true/false)",
+    )
+    declare_compute_kpi = DeclareLaunchArgument(
+    "compute_kpi",
+    default_value="false",
+    description="Run compute_kpi_normalized.py after nav2_test finishes (true/false)",
     )
 
     # Isaac Sim launcher (from IsaacSim ROS workspace)
@@ -108,6 +116,28 @@ def generate_launch_description():
     delayed_nav2_test = TimerAction(period=30.0, actions=[nav2_test_node])
 
 
+    # KPI script path (installed in share/agv_orchestrator/scripts)
+    declare_compute_kpi_script = DeclareLaunchArgument(
+        "compute_kpi_script",
+        default_value=PathJoinSubstitution(
+            [orchestrator_share, "scripts", "compute_kpi_normalized.py"]
+        ),
+        description="Path to compute_kpi_normalized.py to execute",
+    )
+
+
+    # Execute KPI script using system python3 when nav2_test exits
+    compute_kpi_exec = ExecuteProcess(
+        cmd=["python3", compute_kpi_script],
+        output="screen",
+        condition=IfCondition(compute_kpi),
+    )
+
+    # Run KPI when nav2_test process exits
+    run_kpi_on_test_exit = RegisterEventHandler(
+        OnProcessExit(target_action=nav2_test_node, on_exit=[compute_kpi_exec])
+    )
+
     return LaunchDescription([
         declare_usd, declare_play, declare_map, declare_params,
         declare_rviz, declare_rviz_config,
@@ -116,4 +146,7 @@ def generate_launch_description():
         delayed_nav2,
         rviz_node,
         delayed_nav2_test,
+        declare_compute_kpi,
+        declare_compute_kpi_script,
+        run_kpi_on_test_exit,
     ])

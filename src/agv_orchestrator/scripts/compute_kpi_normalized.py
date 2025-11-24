@@ -307,6 +307,17 @@ def main():
     # Plot normalized trajectories (so you can visually confirm alignment)
     # plot_trajectories(real_df, sim_df)
 
+    # Persist J_tilde for this sim run so orchestration/BO can read it later.
+    try:
+        sim_basename = Path(sim_path).stem
+        j_file = LOG_DIR / f"J_{sim_basename}.txt"
+        j_file.parent.mkdir(parents=True, exist_ok=True)
+        with open(j_file, "w") as fh:
+            fh.write(f"{J_tilde:.5f}\n")
+        print(f"[compute_kpi] Wrote J_tilde to {j_file}")
+    except Exception as _err:
+        print(f"[compute_kpi] Failed to write J file: {_err}")
+
 
 if __name__ == "__main__":
     main()

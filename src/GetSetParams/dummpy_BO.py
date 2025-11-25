@@ -5,6 +5,8 @@ from pathlib import Path
 import yaml
 import csv
 
+from bayes_opt import BayesianOptimization  # <-- BO brain
+
 # ---------------- Paths ----------------
 
 LOG_DIR = Path.home() / "schaeffler" / "logs"
@@ -14,6 +16,14 @@ THIS_DIR = Path(__file__).resolve().parent  # ~/schaeffler/src/GetSetParams
 PARAM_TEMPLATE = THIS_DIR / "nav2_params.yaml"       # base template
 PARAM_OVERRIDE = THIS_DIR / "nav2_params_bo.yaml"    # file we generate
 BO_EVALS_CSV = THIS_DIR / "bo_evals.csv"             # evals logged HERE
+
+
+# ---------------- Search bounds (tune these!) ----------------
+# BO will only search inside these ranges.
+pbounds = {
+    "max_vel_x": (0.20, 0.40),
+    "acc_lim_x": (2.0, 3.0),
+}
 
 
 # ---------------- Helpers ----------------
@@ -96,29 +106,59 @@ def append_eval(iter_idx: int, max_vel_x: float, acc_lim_x: float, J: float):
     print(f"[BO] Logged iter={iter_idx}, J={J:.5f} to {BO_EVALS_CSV}", flush=True)
 
 
-# ---------------- Two-iteration test loop ----------------
+# ---------------- BO objective ----------------
+
+_iter_counter = {"i": 0}  # mutable counter so objective() can number iterations
+
+
+def objective(max_vel_x, acc_lim_x):
+    """
+    This is what BO calls.
+    We:
+      * run one full sim with given params
+      * read J
+      * log to CSV
+      * return -J (because BO maximizes, we minimize J).
+    """
+    _iter_counter["i"] += 1
+    it = _iter_counter["i"]
+
+    print("\n" + "=" * 60)
+    print(f"[BO] Iteration {it}")
+    print("=" * 60, flush=True)
+    print(f"[BO] BO proposed: max_vel_x={max_vel_x:.4f}, acc_lim_x={acc_lim_x:.4f}", flush=True)
+
+    J = run_one_sim(max_vel_x, acc_lim_x)
+    print(f"[BO] Iter {it} got J = {J:.5f}", flush=True)
+
+    append_eval(it, max_vel_x, acc_lim_x, J)
+
+    # BO wants to MAXIMIZE this number → we minimize J by returning -J.
+    return -J
+
+
+# ---------------- Main ----------------
 
 def main():
     init_csv_if_needed()
 
-    # For now: explicit 2 candidates (you can choose any values you want)
-    param_candidates = [
-        (0.26, 2.5),  # iteration 1
-        (0.30, 2.5),  # iteration 2 (different max_vel_x)
-    ]
+    optimizer = BayesianOptimization(
+        f=objective,
+        pbounds=pbounds,
+        verbose=2,      # 2 = prints every step
+        random_state=0,
+    )
 
-    for it, (max_vel_x, acc_lim_x) in enumerate(param_candidates, start=1):
-        print("\n" + "=" * 60)
-        print(f"[BO] Iteration {it}/2")
-        print("=" * 60, flush=True)
-
-        J = run_one_sim(max_vel_x, acc_lim_x)
-        print(f"[BO] Iter {it} got J = {J:.5f}", flush=True)
-
-        append_eval(it, max_vel_x, acc_lim_x, J)
+    # For now: 2 total runs (1 random init + 1 BO step).
+    optimizer.maximize(
+        init_points=1,   # random exploration points
+        n_iter=1,        # BO-guided iterations
+    )
 
     print("\n" + "#" * 60)
-    print("[BO] Two-run test finished.")
+    print("[BO] Finished.")
+    print(f"[BO] Best result according to optimizer:")
+    print(optimizer.max)
     print("#" * 60)
 
 

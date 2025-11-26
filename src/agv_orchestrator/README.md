@@ -72,5 +72,14 @@ You can check all available arguments with:
 ros2 launch agv_orchestrator isaac_and_nav2.launch.py --show-args
 ```
 
+### Example
+```bash 
+ros2 launch agv_orchestrator isaac_and_nav2.launch.py rviz:=true run_test:=true compute_kpi:=true
+```
 
+Features:
+- rviz2 with config
+- run test ie localize at (0,0,0) and move straight 5m and record odometry data directly into logs
+- compute kpi whether `J < 1` and dump the J values in `logs/J_nav2_run_x.txt`
 
+> The launch file covers the entire process of simulation

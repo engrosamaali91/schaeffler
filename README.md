@@ -460,5 +460,26 @@ ros2 launch isaacsim run_isaacsim.launch.py gui:="~/Downloads/omron_emma/emma.us
 
 
 
+# Automatic Tuning using bayesian optimzation
 
+```bash
+cd /home/schaeffler/schaeffler/src/GetSetParams 
+python3 dummpy_BO.py
+```
+
+Iteration count: 6
+
+![](media/BO_overlap_plot.png)
+
+The bayesian optimzer suggested
+```bash
+=== BO SURFACE SUMMARY ===
+Total iterations: 6
+Best J = 2.250520 at iter=1
+  max_vel_x = 0.309763
+  acc_lim_x = 2.715189
+```
+
+### Surface plot for 6 iterations
+![](media/BO_surface_plot.png)
 

@@ -95,4 +95,124 @@ The compute-KPI failure was caused by an environment ABI mismatch triggered by p
 
 **ABI clarification:** ABI stands for "Application Binary Interface". In this context it means compiled extension modules (e.g., parts of Matplotlib or NumPy) were built against a different binary interface version of NumPy. That mismatch causes import-time errors. This is unrelated to KPI — KPI is the metric we compute (J_tilde); ABI is a low-level binary compatibility issue in Python extensions.
 
+# Issue 3 — `psutil` missing in venv and system-wide `bayesian-optimization` conflicts
 
+## Summary
+While integrating Bayesian Optimization (BO) into the Isaac Sim + Nav2 + KPI pipeline, two environment-related issues occurred:
+
+1. Isaac Sim failed to start when the orchestrator was run from the `ros2env` virtual environment due to a missing `psutil` module.
+2. Installing `bayesian-optimization` system-wide exposed an incompatibility between the system NumPy and SciPy versions, causing SciPy to crash on import.
+
+Both issues were related to Python environment management, not to the core logic of the BO or KPI code.
+
+---
+
+## Root cause
+
+### Part 1 — `psutil` missing in `ros2env`
+- `run_isaacsim.py` imports `psutil`.
+- System Python already had `psutil 5.9.0` installed, but the `~/ros2env` virtual environment did **not**.
+- When the pipeline was started inside `ros2env` and `ros2 launch` was invoked, `run_isaacsim.py` ran under the venv’s Python interpreter, where `psutil` did not exist.
+- This produced:
+  ```text
+  ModuleNotFoundError: No module named 'psutil'
+
+### ⚙️ Part 2 — System-wide bayesian-optimization breaking SciPy
+
+-----
+
+### **The Problem: ABI Mismatch**
+
+  * **System Python State:**
+      * **`numpy`**: **2.2.6** (from `~/.local/lib/...`, user-installed)
+      * **`scipy`**: **1.8.0** (from `/usr/lib/python3/dist-packages`, Ubuntu package)
+      * **`bayesian-optimization`**: **3.1.0** (installed system-wide)
+  * **The Conflict:**
+      * `bayesian-optimization`'s metadata required `numpy >= 1.25` and `scipy >= 1.0.0`.
+      * SciPy **1.8.0** was compiled against an older version of NumPy (specifically, **`< 1.25.0`**).
+      * When system Python imported SciPy, it found the user-installed **NumPy 2.2.6** at runtime.
+      * **Resulting Error:** The **ABI mismatch** caused SciPy to crash on import:
+        ```
+        A NumPy version >=1.17.3 and <1.25.0 is required for this version of SciPy (detected version 2.2.6)
+        ImportError: cannot import name 'Inf' from 'numpy'
+        ```
+
+-----
+
+### **What Was Tried & Rejected**
+
+  * **Verified:** System Python had `psutil`, but `ros2env` did not.
+  * **Confirmed:** Installing `bayesian-optimization` system-wide immediately caused system Python to crash upon importing SciPy due to the NumPy 2.x / SciPy 1.8.0 mismatch.
+  * **Rejected Solution:** Upgrading system SciPy to match NumPy.
+      * **Reason:** ROS 2 and Isaac Sim rely on the distro-provided scientific stack. Modifying these core system packages was deemed **too risky** and could destabilize the environment.
+
+-----
+
+### **✅ Resolution Strategy**
+
+#### 1\. Fix for `psutil` in `ros2env`
+
+The dependency issue for Isaac Sim was resolved by explicitly installing `psutil` into the **`ros2env`** virtual environment:
+
+```bash
+source ~/ros2env/bin/activate
+pip install "psutil==5.9.0"
+```
+
+  * **Verification:** `which pip` pointed to `~/ros2env/bin/pip`, and `pip show psutil` confirmed the venv location.
+  * **Outcome:** `run_isaacsim.py` could now execute successfully from `ros2env`.
+
+#### 2\. Strategy for `bayesian-optimization`
+
+To avoid the NumPy/SciPy ABI mismatch, the package was confined:
+
+  * **Removed:** System-wide installation of `bayesian-optimization` was **removed/uninstalled**.
+  * **Confined:** `bayesian-optimization` was kept installed **only in `ros2env`**.
+  * **Decision:** Do not use system Python for the Bayesian Optimization (BO) logic; always run BO scripts from **`ros2env`**.
+
+-----
+
+### **💡 Why This Works**
+
+  * **`psutil` in `ros2env`:** Ensures all Python processes launched from the venv (including those invoked by `ros2 launch`) have the necessary dependencies.
+  * **BO Limited to `ros2env`:**
+      * It avoids modifying the core scientific packages in the **system environment**, maintaining stability for ROS 2 and Isaac Sim.
+      * The `ros2env` virtual environment contains an **internally consistent** stack of NumPy, SciPy, scikit-learn, and BO, preventing the ABI mismatch.
+  * **Clean Separation:**
+      * **System-level:** Simulation and Navigation environment (ROS/Isaac).
+      * **`ros2env` venv:** Optimization logic (Bayesian Optimization).
+
+-----
+
+### **📈 Outcome / Behaviour**
+
+The complete pipeline now runs correctly from `ros2env`:
+
+```bash
+source ~/ros2env/bin/activate
+cd ~/schaeffler/src/GetSetParams
+python3 BO.py
+```
+
+  * **Workflow:**
+    1.  **BO (in `ros2env`)** proposes new Nav2 parameters and writes `nav2_params_bo.yaml`.
+    2.  `ros2 launch` starts Isaac Sim + Nav2 and runs the test.
+    3.  KPI script computes the Sim2Real metric $J_{tilde}$ and writes the result to a log file.
+    4.  **BO** reads the latest $J$ value and logs the iteration data in `bo_evals.csv`.
+  * **Stability:** System Python remains untouched regarding BO and scientific package upgrades, which keeps the core ROS/Isaac environment stable.
+
+-----
+
+### **✍️ Notes for Thesis Write-up**
+
+The integration of Bayesian Optimization exposed environment-related issues rather than algorithmic problems:
+
+  * **First,** Isaac Sim failed from within the virtual environment because **`psutil` was not installed there**, even though it existed in system Python. The fix was to explicitly add `psutil` to the `ros2env` venv, aligning the venv with Isaac’s Python dependencies.
+  * **Second,** installing `bayesian-optimization` system-wide revealed an **ABI mismatch** between the system’s SciPy (compiled against NumPy \< 1.25) and a newer NumPy 2.x version in the user site-packages. Instead of modifying the system scientific stack (which could break ROS 2 and Isaac Sim), the solution was to confine BO to the dedicated **`ros2env` environment**, where NumPy, SciPy, scikit-learn, and BO are internally consistent.
+
+This approach cleanly separates:
+
+1.  **the simulation and navigation environment** (system-level ROS/Isaac), and
+2.  **the optimization logic** (inside `ros2env`),
+
+which is important for **reproducibility and stability** of the Sim2Real optimization pipeline.

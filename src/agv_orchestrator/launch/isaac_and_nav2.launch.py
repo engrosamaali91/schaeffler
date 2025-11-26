@@ -1,13 +1,14 @@
 # isaac_and_nav2.launch.py
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction, RegisterEventHandler, ExecuteProcess
+from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction, RegisterEventHandler, ExecuteProcess, EmitEvent
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit
+from launch.events import Shutdown
 
 def generate_launch_description():
     usd_path = LaunchConfiguration("usd_path")
@@ -132,7 +133,13 @@ def generate_launch_description():
         output="screen",
         condition=IfCondition(compute_kpi),
     )
-
+    # After KPI script finishes, shut down the whole launch
+    shutdown_on_kpi_exit = RegisterEventHandler(
+        OnProcessExit(
+            target_action=compute_kpi_exec,
+            on_exit=[EmitEvent(event=Shutdown())],
+        )
+    )
     # Run KPI when nav2_test process exits
     run_kpi_on_test_exit = RegisterEventHandler(
         OnProcessExit(target_action=nav2_test_node, on_exit=[compute_kpi_exec])
@@ -149,4 +156,5 @@ def generate_launch_description():
         declare_compute_kpi,
         declare_compute_kpi_script,
         run_kpi_on_test_exit,
+        shutdown_on_kpi_exit,
     ])

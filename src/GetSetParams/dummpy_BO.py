@@ -74,7 +74,7 @@ def run_one_sim(max_vel_x: float, acc_lim_x: float) -> float:
     cmd = [
         "ros2", "launch",
         "agv_orchestrator", "isaac_and_nav2.launch.py",
-        "rviz:=true",
+        "rviz:=false",
         "run_test:=true",
         "compute_kpi:=true",
         f"params_file:={PARAM_OVERRIDE.absolute()}",
@@ -152,7 +152,7 @@ def main():
     # For now: 2 total runs (1 random init + 1 BO step).
     optimizer.maximize(
         init_points=1,   # random exploration points
-        n_iter=1,        # BO-guided iterations
+        n_iter=5,        # BO-guided iterations
     )
 
     print("\n" + "#" * 60)

@@ -40,6 +40,14 @@ def write_params(max_vel_x: float, acc_lim_x: float):
     ctrl["max_vel_x"] = float(max_vel_x)
     ctrl["max_speed_xy"] = float(max_vel_x)   # keep consistent if you use this param
     ctrl["acc_lim_x"] = float(acc_lim_x)
+    ctrl["decel_lim_x"] = -float(acc_lim_x)
+
+    # velocity_smoother params being consistent too
+    vs = data["velocity_smoother"]["ros__parameters"]
+    vs["max_velocity"][0] = float(max_vel_x)  # x
+    vs["min_velocity"][0] = -float(max_vel_x) # x
+    vs["max_accel"][0] = float(acc_lim_x)  # x
+    vs["max_decel"][0] = -float(acc_lim_x)  # x
 
     PARAM_OVERRIDE.write_text(yaml.safe_dump(data))
     print(
@@ -151,8 +159,8 @@ def main():
 
     # For now: 2 total runs (1 random init + 1 BO step).
     optimizer.maximize(
-        init_points=1,   # random exploration points
-        n_iter=5,        # BO-guided iterations
+        init_points=2,   # random exploration points
+        n_iter=10,        # BO-guided iterations
     )
 
     print("\n" + "#" * 60)

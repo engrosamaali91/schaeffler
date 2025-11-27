@@ -483,3 +483,141 @@ Best J = 2.250520 at iter=1
 ### Surface plot for 6 iterations
 ![](media/BO_surface_plot.png)
 
+---
+
+## How Bayesian Optimization Works in This Project
+
+### Overview
+The `BO.py` script uses **Bayesian Optimization (BO)** to automatically tune Nav2 controller parameters (`max_vel_x` and `acc_lim_x`) to minimize the tracking error (KPI metric `J`) between simulation and real robot behavior.
+
+### Key Components
+
+#### 1. Search Space Definition
+```python
+pbounds = {
+    "max_vel_x": (0.20, 0.40),
+    "acc_lim_x": (2.0, 3.0),
+}
+```
+- BO explores parameter combinations within these bounds
+- You can adjust these ranges based on your robot's capabilities
+
+#### 2. Black-Box Function (`objective`)
+This is the function BO tries to optimize:
+
+```python
+def objective(max_vel_x, acc_lim_x):
+    # 1. Write proposed parameters to nav2_params_bo.yaml
+    write_params(max_vel_x, acc_lim_x)
+    
+    # 2. Launch full simulation pipeline (Isaac Sim + Nav2 + KPI)
+    J = run_one_sim(max_vel_x, acc_lim_x)
+    
+    # 3. Log iteration results to bo_evals.csv
+    append_eval(iteration, max_vel_x, acc_lim_x, J)
+    
+    # 4. Return negative J (BO maximizes, we want to minimize J)
+    return -J
+```
+
+**What "black-box" means:**
+- BO doesn't know the internal workings of the simulation or KPI calculation
+- It only observes: input parameters → output value (J)
+- BO builds a surrogate model (Gaussian Process) to predict which parameters will give better results
+
+#### 3. Workflow Per Iteration
+
+For each iteration, the system:
+
+1. **Parameter Proposal**: BO proposes new `max_vel_x` and `acc_lim_x` values
+2. **Config Update**: `write_params()` updates `nav2_params_bo.yaml` with proposed values
+3. **Simulation Launch**: `run_one_sim()` executes:
+   ```bash
+   ros2 launch agv_orchestrator isaac_and_nav2.launch.py \
+       rviz:=false \
+       run_test:=true \
+       compute_kpi:=true \
+       params_file:=nav2_params_bo.yaml
+   ```
+4. **Test Execution**: `nav2_test.py` runs, robot navigates to goal, odometry logged to `logs/nav2_run_N.csv`
+5. **KPI Computation**: `compute_kpi_normalized.py` automatically runs after test completion:
+   - Compares sim trajectory (`nav2_run_N.csv`) with real robot baseline (`omron_run.csv`)
+   - Computes position RMSE, orientation RMSE, and combined metric J
+   - Writes J to `logs/J_nav2_run_N.txt`
+6. **Result Retrieval**: `load_latest_J()` reads the newest J file
+7. **Logging**: Results saved to `bo_evals.csv` for post-analysis
+8. **BO Update**: BO updates its internal model with the new (params, J) observation
+
+#### 4. Optimization Strategy
+
+```python
+optimizer = BayesianOptimization(
+    f=objective,        # Black-box function to optimize
+    pbounds=pbounds,    # Search space bounds
+    verbose=2,          # Print every step
+    random_state=0,     # Reproducible results
+)
+
+optimizer.maximize(
+    init_points=1,      # Random exploration points (pure random sampling)
+    n_iter=5,           # BO-guided iterations (smart sampling)
+)
+```
+
+**Two-phase approach:**
+- **Exploration phase** (`init_points=1`): Random sampling to gather initial data
+- **Exploitation phase** (`n_iter=5`): BO uses Gaussian Process to intelligently select next parameters that are likely to improve performance
+
+#### 5. Why Return `-J`?
+
+```python
+return -J  # BO maximizes, we minimize J
+```
+
+- Bayesian Optimization **maximizes** the objective function
+- Our KPI `J` represents error (lower is better)
+- By returning `-J`, we convert minimization → maximization
+- BO finds parameters that maximize `-J` = minimize `J`
+
+#### 6. Output and Results
+
+After optimization completes:
+- **Console output**: Best parameters found
+- **`bo_evals.csv`**: Complete history of all iterations (iter, max_vel_x, acc_lim_x, J)
+- **Surface plots**: Visualize how J varies across the parameter space (generated from `bo_evals.csv`)
+
+### Advantages of Bayesian Optimization
+
+1. **Sample Efficient**: Finds good parameters with fewer simulation runs compared to grid search
+2. **Principled Exploration**: Balances trying new areas (exploration) vs. refining known good regions (exploitation)
+3. **Handles Expensive Evaluations**: Each simulation takes minutes; BO intelligently selects which parameters to try next
+4. **No Gradient Required**: Works with black-box simulation where gradients are unavailable
+
+### Customization
+
+To tune different parameters or change search ranges:
+
+1. **Add parameters** to `pbounds`:
+   ```python
+   pbounds = {
+       "max_vel_x": (0.20, 0.40),
+       "acc_lim_x": (2.0, 3.0),
+       "max_vel_theta": (0.5, 2.0),  # Add rotation velocity
+   }
+   ```
+
+2. **Update `write_params()`** to modify the new parameters in `nav2_params_bo.yaml`
+
+3. **Update `objective()` signature** to accept the new parameters:
+   ```python
+   def objective(max_vel_x, acc_lim_x, max_vel_theta):
+       write_params(max_vel_x, acc_lim_x, max_vel_theta)
+       # ... rest of code
+   ```
+
+4. **Adjust iteration counts** in `optimizer.maximize()` based on dimensionality:
+   - More parameters → need more iterations
+   - Rule of thumb: `init_points ≈ n_params`, `n_iter ≥ 5*n_params`
+
+---
+

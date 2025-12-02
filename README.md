@@ -621,3 +621,6 @@ To tune different parameters or change search ranges:
 
 ---
 
+To better visualize how BO explores different samples, the BO ran for 12 iteration and here this is how the surface looks like
+
+![](media/BO_surface_plot_12.gif)

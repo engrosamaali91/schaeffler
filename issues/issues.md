@@ -1,5 +1,22 @@
 # 🤖 Isaac Sim ROS 2 Differential Drive Tuning Issue
 
+## Nav2 Goal Tolerance: Robot Stops Short of Exact Goal
+
+**Description:**  
+When sending a navigation goal (e.g., x=5.0 m), the robot typically stops slightly short of the exact target position. For example, with a 5.0 m goal, the robot may stop at x ≈ 4.79 m (with `xy_goal_tolerance: 0.25`) or x ≈ 4.89 m (with `xy_goal_tolerance: 0.1`).
+
+**Root Cause:**  
+This is expected behavior in Nav2. The navigation stack considers the goal reached as soon as the robot is within the configured `xy_goal_tolerance`. The robot does not attempt to reach the exact coordinate, but rather any position within the tolerance radius.
+
+**What was tried:**  
+- Reduced `xy_goal_tolerance` from 0.25 to 0.1. The robot stopped closer to the goal, but still within the tolerance (e.g., at 4.89 m for a 5.0 m goal).
+- This is not a bug, but a standard feature to prevent oscillation and ensure robust goal completion.
+
+**Recommendation:**  
+No action needed unless exact positioning is critical. For most applications, the default or slightly reduced tolerance is sufficient and recommended.
+
+---
+
 ## Title
 **Conflict: High Damping (Stability) vs. Low Damping (Responsiveness) in Isaac Sim ROS 2 Differential Drive Control**
 
@@ -216,3 +233,4 @@ This approach cleanly separates:
 2.  **the optimization logic** (inside `ros2env`),
 
 which is important for **reproducibility and stability** of the Sim2Real optimization pipeline.
+

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import argparse
 import csv
 from pathlib import Path
 
@@ -9,7 +10,6 @@ from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 from scipy.interpolate import griddata
 
 THIS_DIR = Path(__file__).resolve().parent
-CSV_PATH = THIS_DIR / "bo_evals.csv"
 
 
 def load_evals(csv_path: Path):
@@ -30,10 +30,24 @@ def load_evals(csv_path: Path):
 
 
 def main():
-    if not CSV_PATH.exists():
-        raise FileNotFoundError(f"{CSV_PATH} not found")
+    ap = argparse.ArgumentParser(description="Plot BO optimization surface from evaluation CSV")
+    ap.add_argument(
+        "--eval",
+        type=str,
+        default="bo_evals.csv",
+        help="Path to bo_evals.csv (default: bo_evals.csv in current directory)",
+    )
+    args = ap.parse_args()
 
-    iters, max_vels, acc_lims, Js = load_evals(CSV_PATH)
+    # Resolve the CSV path
+    csv_path = Path(args.eval)
+    if not csv_path.is_absolute():
+        csv_path = THIS_DIR / csv_path
+
+    if not csv_path.exists():
+        raise FileNotFoundError(f"{csv_path} not found")
+
+    iters, max_vels, acc_lims, Js = load_evals(csv_path)
 
     # --- Best point (min J) ---
     best_idx = np.argmin(Js)

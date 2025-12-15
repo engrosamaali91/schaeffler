@@ -144,7 +144,7 @@ controller_server:
       RotateToGoal.scale: 32.0
       RotateToGoal.slowing_factor: 5.0
       acc_lim_theta: 3.2
-      acc_lim_x: 2.7448275956786494
+      acc_lim_x: 2.734673543964893
       acc_lim_y: 0.0
       angular_granularity: 0.025
       critics:
@@ -157,12 +157,12 @@ controller_server:
       - GoalDist
       debug_trajectory_details: true
       decel_lim_theta: -3.2
-      decel_lim_x: -2.7448275956786494
+      decel_lim_x: -2.734673543964893
       decel_lim_y: 0.0
       linear_granularity: 0.05
-      max_speed_xy: 0.2775478745020752
+      max_speed_xy: 0.3372404589936756
       max_vel_theta: 1.0
-      max_vel_x: 0.2775478745020752
+      max_vel_x: 0.3372404589936756
       max_vel_y: 0.0
       min_speed_theta: 0.0
       min_speed_xy: 0.0
@@ -315,19 +315,19 @@ velocity_smoother:
     - 0.0
     feedback: OPEN_LOOP
     max_accel:
-    - 2.7448275956786494
+    - 2.734673543964893
     - 0.0
     - 3.2
     max_decel:
-    - -2.7448275956786494
+    - -2.734673543964893
     - 0.0
     - -3.2
     max_velocity:
-    - 0.2775478745020752
+    - 0.3372404589936756
     - 0.0
     - 1.0
     min_velocity:
-    - -0.2775478745020752
+    - -0.3372404589936756
     - 0.0
     - -1.0
     odom_duration: 0.1

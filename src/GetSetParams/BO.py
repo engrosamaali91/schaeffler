@@ -160,7 +160,7 @@ def main():
     # For now: 2 total runs (1 random init + 1 BO step).
     optimizer.maximize(
         init_points=2,   # random exploration points
-        n_iter=10,        # BO-guided iterations
+        n_iter=5,        # BO-guided iterations
     )
 
     print("\n" + "#" * 60)

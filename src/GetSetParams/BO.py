@@ -121,7 +121,8 @@ _iter_counter = {"i": 0}  # mutable counter so objective() can number iterations
 
 def objective(max_vel_x, acc_lim_x):
     """
-    This is what BO calls.
+    This is what BO calls. 
+    Also called the "objective function (black box)".
     We:
       * run one full sim with given params
       * read J

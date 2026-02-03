@@ -82,7 +82,7 @@ def run_one_sim(max_vel_x: float, acc_lim_x: float) -> float:
     cmd = [
         "ros2", "launch",
         "agv_orchestrator", "isaac_and_nav2.launch.py",
-        "rviz:=false",
+        "rviz:=true",
         "run_test:=true",
         "compute_kpi:=true",
         f"params_file:={PARAM_OVERRIDE.absolute()}",

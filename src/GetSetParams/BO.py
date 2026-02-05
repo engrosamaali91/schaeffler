@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 import yaml
 import csv
+import time
 
 from bayes_opt import BayesianOptimization  # <-- BO brain
 
@@ -57,16 +58,65 @@ def write_params(max_vel_x: float, acc_lim_x: float):
     )
 
 
-def load_latest_J():
-    j_files = list(LOG_DIR.glob("J_nav2_run_*.txt"))
-    if not j_files:
-        raise RuntimeError(f"No J files found in {LOG_DIR}")
+# def load_latest_J():
+#     j_files = list(LOG_DIR.glob("J_nav2_run_*.txt"))
+#     if not j_files:
+#         raise RuntimeError(f"No J files found in {LOG_DIR}")
 
-    latest = max(j_files, key=lambda p: p.stat().st_mtime)
-    j_val = float(latest.read_text().strip())
-    print(f"[BO] Latest J file: {latest.name}, J = {j_val:.5f}", flush=True)
-    return j_val, latest
+#     latest = max(j_files, key=lambda p: p.stat().st_mtime)
+#     j_val = float(latest.read_text().strip())
+#     print(f"[BO] Latest J file: {latest.name}, J = {j_val:.5f}", flush=True)
+#     return j_val, latest
 
+
+def load_latest_J(timeout=5, check_interval=1):
+    """
+    Load latest J value with retry logic.
+    
+    Args:
+        timeout: Max seconds to wait for J file
+        check_interval: Seconds between checks
+    
+    Ensures J file is actually written before reading.
+    """
+    
+    start_time = time.time()
+    latest_j_file = None
+    latest_nav2_time = None
+    
+    # Get timestamp of latest nav2_run_*.csv
+    nav2_files = list(LOG_DIR.glob("nav2_run_*.csv"))
+    if nav2_files:
+        latest_nav2 = max(nav2_files, key=lambda p: p.stat().st_mtime)
+        latest_nav2_time = latest_nav2.stat().st_mtime
+        print(f"[BO] Latest nav2_run: {latest_nav2.name} (time: {latest_nav2_time:.1f})", flush=True)
+    
+    # Wait for J file to be written AFTER the nav2 file
+    while time.time() - start_time < timeout:
+        j_files = list(LOG_DIR.glob("J_nav2_run_*.txt"))
+        if j_files:
+            latest_j_file = max(j_files, key=lambda p: p.stat().st_mtime)
+            j_time = latest_j_file.stat().st_mtime
+            
+            # Check if J file is newer than nav2 file (ensures it was computed for this run)
+            if latest_nav2_time and j_time < latest_nav2_time:
+                print(f"[BO] J file is stale (older than nav2 file), waiting...", flush=True)
+                time.sleep(check_interval)
+                continue
+            
+            try:
+                j_val = float(latest_j_file.read_text().strip())
+                print(f"[BO] Latest J file: {latest_j_file.name}, J = {j_val:.5f}", flush=True)
+                return j_val, latest_j_file
+            except (ValueError, IOError) as e:
+                print(f"[BO] Error reading J file: {e}, retrying...", flush=True)
+                time.sleep(check_interval)
+                continue
+        
+        print(f"[BO] J file not found yet, waiting... ({time.time() - start_time:.1f}s)", flush=True)
+        time.sleep(check_interval)
+    
+    raise RuntimeError(f"Timeout waiting for J file (waited {timeout}s)")
 
 def run_one_sim(max_vel_x: float, acc_lim_x: float) -> float:
     """
@@ -161,7 +211,7 @@ def main():
     # For now: 2 total runs (1 random init + 1 BO step).
     optimizer.maximize(
         init_points=2,   # random exploration points
-        n_iter=5,        # BO-guided iterations
+        n_iter=6,        # BO-guided iterations
     )
 
     print("\n" + "#" * 60)

@@ -207,7 +207,7 @@ def compute_kpis(real_df, sim_df, T_pos, T_psi):
 # ---------------------------------------------------------------------------
 
 LOG_DIR = Path.home() / "schaeffler" / "logs"
-DEFAULT_REAL = LOG_DIR / "omron_run.csv"
+DEFAULT_REAL = LOG_DIR / "omron_run_static_obstacle.csv"
 
 def resolve_csv_paths(args):
     """Resolve real & sim CSV paths.

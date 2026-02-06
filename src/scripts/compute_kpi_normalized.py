@@ -332,6 +332,7 @@ def main():
     # Use standard 'argparse' to avoid conflicts
     parser = argparse.ArgumentParser()
     parser.add_argument("--real", default=None, help="Path to real CSV.")
+    parser.add_argument("--sim", default=None, help="Path to one sim CSV (optional).")
     parser.add_argument("--pos-th", type=float, default=0.1)
     parser.add_argument("--psi-th", type=float, default=0.0349)
     
@@ -347,14 +348,19 @@ def main():
     # Ensure helper functions like normalize_to_start_frame are defined above in your file
     real_df = normalize_to_start_frame(real_df)
 
-    # --- B. Find ALL Sim Logs ---
-    # Scans for nav2_run_*.csv in the LOG_DIR defined globally
-    sim_files = sorted(LOG_DIR.glob("nav2_run_*.csv"))
-    
-    if not sim_files:
-        raise SystemExit(f"No simulation logs found in {LOG_DIR}")
-
-    print(f"Found {len(sim_files)} simulation logs.")
+    # --- B. Find Sim Logs ---
+    if args.sim:
+        sim_path = Path(args.sim)
+        if not sim_path.exists():
+            raise SystemExit(f"Sim CSV not found: {sim_path}")
+        sim_files = [sim_path]
+        print("Using single simulation log.")
+    else:
+        # Scans for nav2_run_*.csv in the LOG_DIR defined globally
+        sim_files = sorted(LOG_DIR.glob("nav2_run_*.csv"))
+        if not sim_files:
+            raise SystemExit(f"No simulation logs found in {LOG_DIR}")
+        print(f"Found {len(sim_files)} simulation logs.")
 
     sim_results = []
 

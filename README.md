@@ -637,3 +637,40 @@ Still surface plot for 12 iteration:
 To visualize all the iteration and its corresponding J values, take a look at the plot
 
 ![](media/BO_iteration_12_plot.png)
+
+
+
+
+## Scenario # 2: Navigation Tuning: Sim-to-Real Alignment
+
+To align the simulation behavior with the physical robot's performance, we tuned the `controller_server` (DWB Local Planner) and `velocity_smoother` parameters. 
+
+**Objective:** Match the simulation's trajectory timing and shape to real-world data to reduce the J-value (trajectory error).
+**Result:** Reduced J-value from **>6.0** to **2.517**.
+
+### 1. Controller Server Configuration
+*Node: `controller_server` (plugin: `dwb_core::DWBLocalPlanner`)*
+
+These adjustments constrain the planner to generate paths that respect the robot's actual physical inertia and friction, rather than its theoretical maximums.
+
+| Parameter | Original Value | Tuned Value | Reason for Change |
+| :--- | :--- | :--- | :--- |
+| **`max_vel_x`** | `0.2` | **`0.16`** | Reduced to match the robot's average effective speed (accounting for real-world friction and noise) rather than peak motor capability. |
+| **`max_vel_theta`** | `0.4` | **`0.2`** | Drastically reduced to match the real robot's slower, more cautious rotation rate. |
+| **`acc_lim_x`** | `0.18` | **`0.05`** | **Critical Fix:** Introduces simulated "inertia." Forces the robot to take ~3s to reach full speed, mimicking physical mass. |
+| **`decel_lim_x`** | `-0.18` | **`-0.05`** | Matched to acceleration limit for symmetric braking behavior. |
+| **`acc_lim_theta`** | `1.0` | **`0.1`** | **Critical Fix:** Eliminates "jittery" movement in simulation. Forces smoother, wider turns (triangle-shaped yaw profile). |
+| **`decel_lim_theta`** | `-1.0` | **`-0.1`** | Matched to rotational acceleration limit. |
+
+### 2. Velocity Smoother Configuration
+*Node: `velocity_smoother`*
+
+The smoother acts as a final "physics clamp" between the navigation stack and the robot driver. These values were updated to match the controller limits to prevent command conflicts.
+
+| Parameter | Original Value | Tuned Value | Reason for Change |
+| :--- | :--- | :--- | :--- |
+| **`max_velocity`** | `[0.2, 0.0, 0.4]` | **`[0.16, 0.0, 0.2]`** | aligned with controller limits (`x`, `y`, `theta`) to prevent the planner from commanding unreachable velocities. |
+| **`min_velocity`** | `[-0.2, 0.0, -0.4]` | **`[-0.16, 0.0, -0.2]`** | Symmetric limits for backward motion and rotation. |
+| **`max_accel`** | `[0.18, 0.0, 1.0]` | **`[0.05, 0.0, 0.1]`** | **Physics Match:** Constrains the rate of change of velocity to simulate the robot's physical mass and motor lag. |
+| **`max_decel`** | `[-0.18, 0.0, -1.0]` | **`[-0.05, 0.0, -0.1]`** | Symmetric limits for stopping. |
+

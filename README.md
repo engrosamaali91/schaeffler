@@ -685,3 +685,7 @@ After:
 
 
 
+Using Bayesian optimizer.
+The overlapping plot looks like this
+
+![](media/plots/14_iteration_bo.png)

@@ -674,3 +674,14 @@ The smoother acts as a final "physics clamp" between the navigation stack and th
 | **`max_accel`** | `[0.18, 0.0, 1.0]` | **`[0.05, 0.0, 0.1]`** | **Physics Match:** Constrains the rate of change of velocity to simulate the robot's physical mass and motor lag. |
 | **`max_decel`** | `[-0.18, 0.0, -1.0]` | **`[-0.05, 0.0, -0.1]`** | Symmetric limits for stopping. |
 
+To see the affect of these changes as a validation please refer to the 
+Before:
+
+![](media/plots/manual_perturbation_test_15/overlap_test_before_15.png)
+
+After:
+
+![](media/plots/manual_perturbation_test_15/overlap_test_after_15.png)
+
+
+

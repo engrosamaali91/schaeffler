@@ -257,25 +257,38 @@ def plot_all_trajectories(real_df, sim_results):
     ax.set_xlabel("time [s]")
     ax.grid(True)
 
-    # --- 5. Trajectory Overlap (X-Y) ---
-    ax = axes[4]
-    ax.plot(real_df["x"], real_df["y"], "k-", linewidth=3, label="Real Path")
+# --- 5. Trajectory Overlap (X-Y) ---
+    ax_final = axes[4]
+    ax_final.plot(real_df["x"], real_df["y"], "k-", linewidth=3, label="Real Path")
     
-    # Plot sims with labels including their J score
     for i, sim in enumerate(sim_results):
         label_str = f"{sim['label']} (J={sim['J']:.3f})"
-        ax.plot(sim['df']["x"], sim['df']["y"], color=colors[i], linewidth=1.5, label=label_str)
+        ax_final.plot(sim['df']["x"], sim['df']["y"], color=colors[i], linewidth=1.5, label=label_str)
         
-    ax.set_title("Trajectory Overlap: Sim vs Real")
-    ax.set_xlabel("X [m]")
-    ax.set_ylabel("Y [m]")
-    ax.grid(True)
-    ax.axis('equal') 
+    ax_final.set_title("Trajectory Overlap: Sim vs Real")
+    ax_final.set_xlabel("X [m]")
+    ax_final.set_ylabel("Y [m]")
+    ax_final.grid(True)
+    ax_final.axis('equal') 
     
-    # Legend outside the plot area
-    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', fontsize='small')
+    # --- PLACING LEGEND NEXT TO THE 3rd PLOT (Middle) ---
+    # We pull the labels from the final plot (ax_final) 
+    # but attach the legend to the 3rd axes (axes[2])
+    handles, labels = ax_final.get_legend_handles_labels()
+    
+    axes[2].legend(
+        handles, 
+        labels, 
+        bbox_to_anchor=(1.02, 0.5), 
+        loc='center left', 
+        fontsize='small', 
+        borderaxespad=0
+    )
 
+    # Adjust layout and ensure the right side has room
     plt.tight_layout()
+    fig.subplots_adjust(right=0.8) 
+    
     plt.show()
 
 
@@ -334,7 +347,7 @@ def main():
     parser.add_argument("--real", default=None, help="Path to real CSV.")
     parser.add_argument("--sim", default=None, help="Path to one sim CSV (optional).")
     parser.add_argument("--pos-th", type=float, default=0.1)
-    parser.add_argument("--psi-th", type=float, default=0.0349)
+    parser.add_argument("--psi-th", type=float, default=0.1)
     
     args = parser.parse_args()
 

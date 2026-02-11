@@ -643,6 +643,11 @@ To visualize all the iteration and its corresponding J values, take a look at th
 
 ## Scenario # 2: Navigation Tuning: Sim-to-Real Alignment
 
+![](media/scenario_2.png)
+
+
+
+
 To align the simulation behavior with the physical robot's performance, we tuned the `controller_server` (DWB Local Planner) and `velocity_smoother` parameters. 
 
 **Objective:** Match the simulation's trajectory timing and shape to real-world data to reduce the J-value (trajectory error).

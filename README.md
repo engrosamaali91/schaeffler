@@ -689,3 +689,8 @@ Using Bayesian optimizer.
 The overlapping plot looks like this
 
 ![](media/plots/14_iteration_bo.png)
+
+
+The surface plot with 4D search space 
+
+![](media/plots/14_iteration_surface_plot.png)

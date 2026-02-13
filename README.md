@@ -679,6 +679,19 @@ The smoother acts as a final "physics clamp" between the navigation stack and th
 | **`max_accel`** | `[0.18, 0.0, 1.0]` | **`[0.05, 0.0, 0.1]`** | **Physics Match:** Constrains the rate of change of velocity to simulate the robot's physical mass and motor lag. |
 | **`max_decel`** | `[-0.18, 0.0, -1.0]` | **`[-0.05, 0.0, -0.1]`** | Symmetric limits for stopping. |
 
+### 3. Static Parameter Updates
+*One-time changes (not BO-iterated)*
+
+| Parameter | Original Value | Tuned Value | Reason for Change |
+| :--- | :--- | :--- | :--- |
+| **`min_y_velocity_threshold`** | `0.5` | **`0.001`** | Lowered to avoid premature zeroing of small lateral velocities due to noise; preserves subtle drift detection. |
+| **`sim_time`** | `1.7` | **`2.0`** | Increased to give the planner a slightly longer forward simulation window for smoother, more stable trajectories. |
+| **`xy_goal_tolerance`** | `0.25` | **`0.3`** | Relaxed to reduce unnecessary final oscillations when the robot is already within acceptable proximity to the goal. |
+| **`trans_stopped_velocity`** | `0.25` | **`0.05`** | Lowered to classify the robot as stopped only when it is truly near zero speed, preventing false stop detection. |
+
+
+
+
 To see the affect of these changes as a validation please refer to the 
 Before:
 

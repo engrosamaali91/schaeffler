@@ -2,7 +2,7 @@
 
 This repository contains an Isaac Sim + ROS 2 Nav2 workflow for AGV simulation, localization, navigation, and Sim2Real parameter tuning.
 
-![](media/SystemArchitecture.gif)
+![](media/System_Architecture.gif)
 
 ## Table of Contents
 

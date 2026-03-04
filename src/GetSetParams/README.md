@@ -1,49 +1,53 @@
-## 🚀 Nav2 Parameter Optimization Progress
+# Table of Contents
 
-### 🧩 Goal
-Automate Nav2 parameter tuning to bridge the **Sim2Real gap** by:
-- Reading parameters from the base `nav2_params.yaml`
-- Overwriting selected parameters (manually or automatically)
-- Dumping updated parameters into a new file (`nav2_trialXX.yaml`)
-- Launching Nav2 with the new file and measuring KPI (**J** value)
+- [Nav2 Parameter Optimization](#nav2-parameter-optimization)
+- [Overview](#overview)
+- [Bayesian Optimization Pipeline (Scenario 1 & 2)](#bayesian-optimization-pipeline-scenario-1--2)
+- [Scenario Differences (S1 vs S2)](#scenario-differences-s1-vs-s2)
+- [Parameter Initialization](#parameter-initialization)
+- [Search Space (pbounds)](#search-space-pbounds)
+- [Optimization Loop](#optimization-loop)
+- [In Summary — Key Motion Parameters](#in-summary--key-motion-parameters)
+- [Concept](#concept)
 
----
+# Nav2 Parameter Optimization
 
-### ⚙️ 1. Manual Parameter Override
-**Script:** `nav2_yaml_override.py`  
-Loads an existing parameter file, overwrites selected keys, and saves a new one.
+## Overview
 
-```bash
-python3 nav2_yaml_override.py \
-  --in src/GetSetParams/nav2_trial02.yaml \
-  --out src/GetSetParams/nav2_trial03.yaml \
-  --set \
-    controller_server.FollowPath.max_vel_x=0.28 \
-    controller_server.FollowPath.acc_lim_x=2.3 \
-    controller_server.FollowPath.sim_time=1.6
-```
+This workflow automates Nav2 tuning to reduce the **Sim2Real gap** using Bayesian Optimization.
 
-### Automated Parameter Proposal (Optimizer)
-```bash
-python3 nav2_optimize_and_override.py \
-  --in nav2_params.yaml \
-  --out nav2_trial.yaml \
-  --keys \
-    controller_server.FollowPath.max_vel_x \
-    controller_server.FollowPath.acc_lim_x \
-    controller_server.FollowPath.max_vel_theta \
-    controller_server.FollowPath.acc_lim_theta \
-    controller_server.FollowPath.sim_time \
-    controller_server.FollowPath.xy_goal_tolerance \
-  --j 1.34 \
-  --state optimizer_state.json \
-  --lower 0.0 --upper 2.0 \
-  --seed 42
-```
+Two scripts are used for the same pipeline:
+- `BO.py` for Scenario 1
+- `BO_s2.py` for Scenario 2
+
+Both scripts follow one common loop: generate parameters, run a full sim test via `agv_orchestrator`, read KPI `J`, log results, and let Bayesian Optimization propose the next candidate.
+
+Search ranges are defined directly inside each Python script through `pbounds` (not through `bounds.yaml`).
+
+## Bayesian Optimization Pipeline (Scenario 1 & 2)
+
+1. Start from a base Nav2 template (`nav2_params.yaml` or `nav2_params_modified.yaml`).
+2. Apply optimizer-proposed values into key controller and velocity smoother fields.
+3. Write an override file (`nav2_params_bo.yaml`) used only for that iteration.
+4. Launch one full run:
+	- `ros2 launch agv_orchestrator isaac_and_nav2.launch.py`
+	- `rviz:=true run_test:=true compute_kpi:=true`
+	- `params_file:=<absolute path to nav2_params_bo.yaml>`
+5. Read the latest KPI file `logs/J_nav2_run_*.txt` associated with the newest run data.
+6. Append the trial to `bo_evals.csv` (iteration, parameters, KPI).
+7. Return `-J` to the optimizer (because `bayes_opt` maximizes while we want to minimize `J`).
+8. Repeat for initialization points and BO-guided iterations, then report the best configuration.
+
+## Scenario Differences (S1 vs S2)
+
+- **Tuning dimension**: Scenario 1 optimizes 2 variables (`max_vel_x`, `acc_lim_x`); Scenario 2 optimizes 4 (adds `max_vel_theta`, `acc_lim_theta`).
+- **Template**: Scenario 1 uses `nav2_params.yaml`; Scenario 2 uses `nav2_params_modified.yaml`.
+- **Search focus**: Scenario 2 uses tighter, manually informed low-acceleration bounds.
+- **KPI fallback behavior**: Scenario 2 returns penalty `J=10.0` on KPI timeout; Scenario 1 raises timeout error.
+- **CSV columns**: Scenario 2 logs angular parameters in addition to linear ones.
 
 
-
-### Parameter Initialization
+## Parameter Initialization
 All initial parameters in `nav2_params.yaml` are derived from the real robot’s configuration:
 
 | Robot UI Param | Converted Nav2 Param | Units | Source |
@@ -53,14 +57,27 @@ All initial parameters in `nav2_params.yaml` are derived from the real robot’s
 | RotVelMax = 60 deg/s | max_vel_theta = 1.05 | rad/s | MobilePlanner |
 | RotAccel = 90 deg/s² | acc_lim_theta = 1.57 | rad/s² | MobilePlanner |
 
-### Bounds
-`bounds.yaml` defines allowed search space for the optimizer based on the same physical limits of the real robot.
+## Search Space (pbounds)
 
-### Optimization Loop
+The optimizer search space is defined in code (`pbounds`) in each script:
+
+- **Scenario 1 (`BO.py`)**
+	- `max_vel_x`: `0.20` to `0.40`
+	- `acc_lim_x`: `2.0` to `3.0`
+
+- **Scenario 2 (`BO_s2.py`)**
+	- `max_vel_x`: `0.12` to `0.22`
+	- `acc_lim_x`: `0.02` to `0.22`
+	- `max_vel_theta`: `0.10` to `0.50`
+	- `acc_lim_theta`: `0.03` to `0.50`
+
+This means each BO iteration proposes parameters only inside these ranges.
+
+## Optimization Loop
 1. Start with `nav2_params.yaml`
 2. Run Nav2 → compute J
-3. Optimizer proposes new params within `bounds.yaml`
-4. Write `nav2_trialXX.yaml`
+3. Optimizer proposes new params within script-defined `pbounds`
+4. Write `nav2_params_bo.yaml`
 5. Relaunch → recompute J → iterate
 
 
@@ -80,7 +97,7 @@ All initial parameters in `nav2_params.yaml` are derived from the real robot’s
 
 
 
-## ✅ In Summary — Key Motion Parameters
+## In Summary — Key Motion Parameters
 
 | Term | Intuitive Meaning | Formula / Effect |
 |------|--------------------|------------------|
@@ -90,7 +107,7 @@ All initial parameters in `nav2_params.yaml` are derived from the real robot’s
 
 
 
-### Concept
+## Concept
 
 During navigation, the robot begins each motion at 0 m/s and ramps its velocity until reaching max_vel_x, respecting the limit imposed by ```acc_lim_x```.
 The pair (```max_vel_x, acc_lim_x```) directly shapes how aggressively or smoothly the robot accelerates and decelerates in simulation versus reality.
@@ -103,15 +120,3 @@ In the Sim2Real optimization, these are the primary tuning knobs:
 
 The goal of optimization is to find parameter values that reproduce the real robot’s acceleration profile and motion timing inside simulation, minimizing the measured Sim2Real gap (J).
 
-
-### ⚠️ Limitations of the Adaptive Step-Size Optimizer
-
-This optimizer adapts **all parameter values** based on a **single global KPI (J)** — it does not know which individual key caused the improvement or degradation.
-
-| Aspect | Description |
-|--------|--------------|
-| **Global feedback** | Uses one J value for all keys; if J worsens, all parameters are adjusted (even if only one caused it). |
-| **No parameter interaction modeling** | Does not learn relationships or coupling between parameters (e.g., `max_vel_x` ↔ `acc_lim_x`). |
-| **Slow fine-tuning** | Random perturbations and global updates can require many iterations to converge. |
-
-Despite this, the method is **lightweight, derivative-free, and adaptive**, making it ideal for early-stage Sim2Real tuning when only a few parameters are optimized.

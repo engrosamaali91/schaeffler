@@ -2,7 +2,7 @@
 
 This repository contains an Isaac Sim + ROS 2 Nav2 workflow for AGV simulation, localization, navigation, and Sim2Real parameter tuning.
 
-![](media/System_Architecture.png)
+![](media/SystemArchitecture.gif)
 
 ## Table of Contents
 
@@ -13,13 +13,17 @@ This repository contains an Isaac Sim + ROS 2 Nav2 workflow for AGV simulation, 
   - [Core Components](#core-components)
   - [Isaac Sim Configuration](#isaac-sim-configuration)
     - [Robot Stage Setup](#robot-stage-setup)
+      - [Emma Cobot Stage Tree](#emma-cobot-stage-tree)
     - [Joint Configuration](#joint-configuration)
+      - [Revolute Joint and Angular Drive API](#revolute-joint-and-angular-drive-api)
     - [Wheel Transform](#wheel-transform)
     - [LiDAR Placement and Orientation](#lidar-placement-and-orientation)
     - [Clock Publisher](#clock-publisher)
     - [Differential Controller](#differential-controller)
     - [ROS Generic Publisher](#ros-generic-publisher)
     - [LiDAR Pipeline](#lidar-pipeline)
+      - [Physics LiDAR (active)](#physics-lidar-active)
+      - [RTX LiDAR (reference)](#rtx-lidar-reference)
     - [ROS Odometry and TF Publication](#ros-odometry-and-tf-publication)
   - [Prerequisites](#prerequisites)
   - [Quick Start](#quick-start)

@@ -1,303 +1,307 @@
-# Steps for Converting Data, Preprocessing, and Running `compute_kpis.py`
+# Sim2Real KPI Workflow and Findings
 
-## Step 1: **Converting Simulated Data (rosbag) to CSV**
+This document describes the process used to collect real and simulated trajectory data, preprocess both datasets, compute alignment KPIs, and evaluate tuning iterations for Sim2Real matching.
 
-1. **Command used**:
-   - Convert the ROS bag file to CSV using extract_rosbagdata.py file and then preprocess the data using preprocess.py. 
-   
-2. **Preprocessing the data**:
-   - **Trimming**: Using velocity (`vx > 0.02 m/s`) and goal proximity (goal reached when `x, y` within 0.05 m of target).
-   - **Zeroing**: Subtract the first timestamp (`t0`) to start at **`t=0`** for both sim and real data.
-   - ```python preprocess.py```
+## Table of Contents
 
-3. Plotting 
-   - Plot using python plot.py script to visualize the plot
----
-
-## Step 2: **Recording Real Robot Data Using MQTT**
-
-1. **Setup**:
-   - MQTT client connects to the robot at `HOST = 192.168.18.3` on port `8883` using TLS for security.
-
-2. **Data Logging**:
-   - Subscribe to pose and status topics: `itk/dt/robot/pose` and `itk/dt/robot/status`.
-   - Log data only when `status="Driving"` (motion is active).
-   - ```python mqtt.py```
-
-3. **Data Format**:
-   - Log format: `t, x, y, yaw` (where `t` is in seconds, `x, y` in meters, and `yaw` in radians).
-
-4. **MQTT Data Handling**:
-   - When a status update is received, check if the robot is moving (`status=="Driving"`).
-   - On receiving pose data (`/pose` topic), write the `t,x,y,yaw` values to a CSV file.
-
----
-
-## Step 3: **Running `compute_kpis.py`**
-
-1. **Input**:  
-   - **Real and Sim CSVs**: Both datasets are in the format of `t,x,y,yaw`.
-
-2. **Preprocessing before KPIs**:
-   - Normalize both datasets to the same start pose and initial yaw. This aligns both real and simulated data in the same coordinate frame (zeroed at the start position, initial yaw set to 0).
-
-3. **Key Functionality**:
-   - **Resampling**: The script resamples both the real and sim data to **10 Hz** based on the overlapping time range.
-   - **KPIs Computation**: Computes **RMSE_pos**, **RMSE_psi**, and **J_tilde**:
-     - **RMSE_pos**: Position error between real and sim.
-     - **RMSE_psi**: Yaw error.
-     - **J_tilde**: Normalized combined error score.
-
-4. **Running the script**:
-   - Example command:
-     ```bash
-     python compute_kpis.py --real real_log_for_kpi.csv --sim sim_log_for_kpi.csv
-     ```
-
----
-
-## Step 4: **Running the Entire Process**
-
-1. **Data Logging (Real Robot)**:
-   - Run the MQTT script that logs real robot data and outputs to `real_log_for_kpi.csv`.
-
-2. **Simulated Data Conversion**:
-   - Convert simulated rosbag data to `sim_log_for_kpi.csv`.
-
-3. **Run `compute_kpis.py`**:
-   - Use the following command to compute the KPIs:
-     ```bash
-     python compute_kpis.py --real real_log_for_kpi.csv --sim sim_log_for_kpi.csv
-     ```
-
-4. **Output**:
-   - Prints RMSE values for position (`RMSE_pos`), yaw (`RMSE_psi`), and combined error (`J_tilde`).
-
-
-# Finding: Adjusting Tolerances Based on Omron LD250 Datasheet
-
-## Problem:
-When comparing the real robot data with the simulated data, **J_tilde** was high due to the large position error (1.08 m) in the real robot's movement. This was after setting the default thresholds for position and yaw based on initial assumptions.
-
-## Approach:
-1. **Original Thresholds**:
-   - **Position Tolerance (`T_pos`)**: 0.03 m (3 cm)
-   - **Yaw Tolerance (`T_psi`)**: 0.02 rad (~1.15°)
-
-2. **Omron LD250 Datasheet Thresholds**:
-   - **Position Tolerance (`T_pos`)**: 0.1 m (100 mm)
-   - **Yaw Tolerance (`T_psi`)**: 0.0349 rad (2°)
-
-## Results:
-
-### **Before Adjusting to LD250 Thresholds**:
-```bash
-RMSE_pos  [m]  = 1.08025
-RMSE_psi  [rad] = 0.02637  [deg] = 1.51065
-J_tilde         = 18.66327
-```
-
-### **After Adjusting to LD250 Thresholds**:
-```
-RMSE_pos  [m]  = 1.08025
-RMSE_psi  [rad] = 0.02637  [deg] = 1.51065
-J_tilde         = 5.77897
-```
-
-J_tilde = 5.77897 shows a significant reduction in J_tilde after increasing the position threshold to 0.1 m and yaw to 2°, as per the Omron LD250 datasheet.
-
-
-
-### KPI Evaluation Results of pilot iteration 
-
-| Metric | Description | Value | Interpretation |
-|---------|--------------|--------|----------------|
-| **Overlap** | Common time window between real and simulated trajectories | 0.00 – 9.90 s | 10 s of overlapping data used for comparison |
-| **Sim Δx, Δy [m]** | Net displacement of simulated robot in X/Y | 2.937, −0.018 | Sim robot moved ~3 m forward |
-| **Real Δx, Δy [m]** | Net displacement of real robot in X/Y | 0.921, −0.012 | Real robot moved ~1 m forward |
-| **Samples** | Number of synchronized samples at ~10 Hz | 100 | Sufficient data for KPI computation |
-| **RMSE_pos [m]** | Root Mean Square Error of position | **2.018** | Large spatial deviation between sim and real |
-| **RMSE_psi [rad] / [deg]** | Root Mean Square Error of yaw | **0.0175 rad (≈ 1.0°)** | Good heading agreement |
-| **J_tilde** | Combined normalized KPI (≤ 1.0 = pass) | **10.34** | Fails threshold — significant sim-to-real gap in position |
-
-**Summary:**  
-Simulation shows similar heading but moves ~3× farther than the real robot, leading to a high position RMSE and large `J_tilde`.  
-Further tuning of simulated robot dynamics or control parameters is required to reduce the sim-to-real gap.
-
-
-
-## 🧠 Finding: Effect of Differential Controller Caps on Simulated AGV Dynamics
-
-### 🎯 Purpose
-To investigate the impact of **Isaac Sim's Differential Controller Node** caps on robot stability and control, particularly in relation to wheel joint damping and velocity control.
-
-### ⚙️ Setup & Iterations
-1. **Initial Setup (With Caps)**
-   - `maxLinearSpeed`: 1.2 m/s
-   - `maxAngularSpeed`: 1.047 rad/s
-   - Wheel joint damping: default values
-   - Result: Stable motion with predictable behavior
-
-2. **Removed Caps**
-   - All cap values set to `0`
-   - Initial wheel joint damping: 1e-9
-   - Result: Loss of control, particularly in angular motion
-
-3. **Damping Adjustment Attempts**
-   - Tested damping range: 1e-9 to 1e-4
-   - Result: Persistent control issues:
-     - Poor angular control
-     - Delayed stopping response
-     - Robot continued moving even without velocity commands
-
-4. **Final Configuration (Restored Caps)**
-   - Restored original cap values
-   - Result: Regained stability and control
-
-### 📊 Key Observations
-| Configuration | Behavior | Control Response | Stability |
-|--------------|----------|------------------|-----------|
-| **With Caps** | Predictable motion | Immediate stop response | High stability |
-| **No Caps** | Erratic movement | Delayed stopping | Poor stability |
-| **No Caps + Adjusted Damping** | Improved but still unstable | Inconsistent response | Medium-low stability |
-
-
-The below image shows the inital (first iteration) effect of removing and adding cap values
-![Comparison of capped vs uncapped differential controller behavior](images/before_after_cap_remove.png)
-
-
-### ⚠️ Critical Findings
-1. **Cap Values are Essential:**
-   - Despite being optional parameters, caps play a crucial role in maintaining simulation stability
-   - They provide an additional layer of control that complements ROS 2 controllers
-
-2. **Damping Sensitivity:**
-   - Robot's behavior is highly sensitive to wheel joint damping values
-   - Removing caps exposed underlying stability issues that damping adjustments couldn't fully resolve
-
-3. **Control Hierarchy:**
-   - Isaac Sim's caps provide a fundamental control envelope
-   - ROS 2 controllers work best within this envelope rather than as the sole control mechanism
-
-### ✅ Conclusion
-> **Cap values in Isaac Sim's Differential Controller Node should be maintained** for optimal stability and control.
-> While theoretically optional, they provide essential boundaries for realistic robot behavior and stable simulation.
-
-### 🔍 Technical Implications
-- Keep caps matched to real robot specifications (1.2 m/s, 1.047 rad/s)
-- Consider caps as part of the core simulation configuration
-- Use ROS 2 controllers for fine-tuning within these boundaries
-- Monitor joint damping values but prioritize cap settings for stability
-
-### 🛠️ Best Practices
-1. Start with manufacturer-specified cap values
-2. Maintain caps even when using ROS 2 controllers
-3. Use ROS 2 controllers for trajectory refinement
-4. Consider caps as safety limits rather than optional parameters
-
-
-# Sim2Real Alignment Process
+- [Sim2Real KPI Workflow and Findings](#sim2real-kpi-workflow-and-findings)
+  - [Table of Contents](#table-of-contents)
+  - [Overview](#overview)
+  - [Data Collection and Preprocessing Pipeline](#data-collection-and-preprocessing-pipeline)
+    - [Step 1: Convert Simulated Data (rosbag to CSV)](#step-1-convert-simulated-data-rosbag-to-csv)
+    - [Step 2: Record Real Robot Data (MQTT)](#step-2-record-real-robot-data-mqtt)
+    - [Step 2A: Macro-Based Logging (LD-250)](#step-2a-macro-based-logging-ld-250)
+      - [Robot pose message fields and unit conversion](#robot-pose-message-fields-and-unit-conversion)
+      - [Macro workflow](#macro-workflow)
+      - [Default Omron configuration notes](#default-omron-configuration-notes)
+    - [Step 3: Full End-to-End Run](#step-3-full-end-to-end-run)
+  - [Running `compute_kpis.py`](#running-compute_kpispy)
+  - [Tolerance Selection Based on Omron LD250 Datasheet](#tolerance-selection-based-on-omron-ld250-datasheet)
+    - [Problem](#problem)
+    - [Thresholds](#thresholds)
+    - [Results](#results)
+  - [Pilot KPI Evaluation](#pilot-kpi-evaluation)
+  - [Finding: Effect of Differential Controller Caps](#finding-effect-of-differential-controller-caps)
+    - [Observed Configurations](#observed-configurations)
+    - [Key Observation Table](#key-observation-table)
+  - [Sim2Real Alignment Process](#sim2real-alignment-process)
+    - [Objective](#objective)
+    - [Method](#method)
+    - [Visualizations](#visualizations)
+  - [Iteration Summary](#iteration-summary)
+  - [Detailed Iterations (5-7)](#detailed-iterations-5-7)
+    - [Manual check snapshot](#manual-check-snapshot)
+    - [Iteration 5: Remove DCN cap values](#iteration-5-remove-dcn-cap-values)
+    - [Iteration 6: Increase ROS velocity toward real robot profile](#iteration-6-increase-ros-velocity-toward-real-robot-profile)
+    - [Iteration 7: Reduce acceleration by 50%](#iteration-7-reduce-acceleration-by-50)
+    - [J progression plot](#j-progression-plot)
+  - [Conclusion](#conclusion)
 
 ## Overview
 
-This document describes the process for aligning the trajectory of a simulated robot with a real robot. The goal is to adjust simulation parameters (Isaac Sim and Nav2) such that the **simulated robot's trajectory closely matches** the real robot’s trajectory. This alignment is measured using **Root Mean Squared Error (RMSE)** in position and yaw, and a performance metric **J_tilde**.
+The objective is to align the simulated AGV trajectory with the real robot trajectory by minimizing:
 
-## Objective
+- `RMSE_pos` (position error)
+- `RMSE_psi` (yaw error)
+- `J_tilde` (normalized combined KPI)
 
-- **Align the simulated robot’s path with the real robot's path**, specifically focusing on the **x (forward)** and **y (lateral)** position, as well as the **yaw** orientation.
-- Ensure that the **RMSE** values for **position** and **yaw** are minimized, resulting in **J_tilde < 1**.
+A practical pass criterion is:
 
-## Key Steps
+- `J_tilde <= 1.0`
 
-### 1. Data Preprocessing and Alignment
+## Data Collection and Preprocessing Pipeline
 
-- **Normalize both real and simulated data**:
-  - The first step is to **normalize** the trajectories of both the real and simulated robots to a common reference frame (aligned to **(0,0)** and the initial heading of the robot).
-  - Both datasets are resampled to a common 10 Hz frequency to ensure they are comparable.
+### Step 1: Convert Simulated Data (rosbag to CSV)
 
-### 2. Metrics Calculation
+- Convert rosbag output to CSV using the extraction script.
+- Preprocess with:
+  - Trimming by motion (`vx > 0.02 m/s`) and goal proximity.
+  - Time zeroing (`t = t - t0`) for both real and sim logs.
 
-- **Root Mean Squared Error (RMSE)**:
-  - The RMSE for both position (Δx, Δy) and yaw (Δψ) is computed.
-  - **Position RMSE** measures the deviation in both x and y coordinates between the real and simulated robots.
-  - **Yaw RMSE** measures the difference in orientation between the real and simulated robots.
+```bash
+python preprocess.py
+```
 
-- **Performance Metric (J_tilde)**:
-  - **J_tilde** is calculated by normalizing the **RMSE values** with the threshold values for position and yaw. 
-  - Ideally, for a perfect alignment, **J_tilde should be less than 1**.
+- Plot for quick validation:
 
-### 3. Simulation Parameter Tuning
+```bash
+python plot.py
+```
 
-- **Isaac Sim Differential Drive Cap**:
-  - The **maxWheelSpeed** parameter in Isaac Sim was adjusted to slow down the simulated robot and bring its trajectory closer to that of the real robot.
-  - A comparison of the robot’s trajectory with **maxWheelSpeed** set to **1.2** and **0.5** showed improvement in the alignment, with **J_tilde dropping from 13.83 to 7.07**.
+### Step 2: Record Real Robot Data (MQTT)
 
-### 4. Result Evaluation
+- MQTT endpoint:
+  - Host: `192.168.18.3`
+  - Port: `8883`
+  - TLS enabled
 
-- After adjusting the simulation parameters, the **Δx** and **Δy** values for the real and simulated robots were compared.
-  - **Δx** and **Δy** are the total distance traveled in the x and y directions, respectively.
-  - **J_tilde** provides an overall performance measure of alignment, where values below **1.0** indicate good alignment.
+- Subscribed topics:
+  - `itk/dt/robot/pose`
+  - `itk/dt/robot/status`
 
-### 5. Observations and Future Steps
+- Logging logic:
+  - Record pose only when `status == "Driving"`.
+  - Output format: `t, x, y, yaw` where:
+    - `t` in seconds
+    - `x, y` in meters
+    - `yaw` in radians
 
-- **Findings:**
-  - By limiting the **maxWheelSpeed** in Isaac Sim, we were able to slow down the simulated robot, leading to a **better alignment with the real robot** (as shown by the improved **J_tilde** value).
-  
-- **Next Steps:**
-  - **Fine-tune the Nav2 parameters** (e.g., `max_vel_x`, `acc_lim_x`, `decel_lim_x`) to refine the simulation’s behavior.
-  - Compare the **velocity profiles** (vx) alongside the position and yaw for a more comprehensive alignment.
-  - Use **advanced Nav2 parameters** (such as **`velocity_smoother`**) to improve trajectory smoothing and overall control.
+```bash
+python mqtt.py
+```
 
----
+### Step 2A: Macro-Based Logging (LD-250)
 
-## Visualizations
+This section consolidates the macro-based real robot logging workflow used for controlled speed runs and KPI-ready CSV generation.
 
-Below are the plots showing the **before** and **after** results of the alignment process:
+#### Robot pose message fields and unit conversion
 
-- **Before Parameter Adjustment:**
+The Omron LD-250 publishes pose data on `itk/dt/robot/pose`. Use the following conversions before KPI processing.
 
-  ![Before](images/itr_2_5m/overlap_plot_before.png)  
-  *[isaac sim with 1.2m/s cap value]*
+| Field | Description | Message Unit | SI Unit | Conversion |
+|---|---|---|---|---|
+| `x` | Position along X-axis | millimeters (mm) | meters (m) | `x_m = x / 1000` |
+| `y` | Position along Y-axis | millimeters (mm) | meters (m) | `y_m = y / 1000` |
+| `th` | Orientation (theta/yaw) | degrees (milli-scaled payload) | radians (rad) | `th_rad = th / 1000` |
+| `upd` | Pose update timestamp | Unix time in ms | seconds (s) | `t_s = upd / 1000` |
 
-- **After Parameter Adjustment:**
+#### Macro workflow
 
-  ![After](images/itr_2_5m/overlap_plot_after.png)  
-  *[isaac sim with 0.5m/s vap value]*
+- `macro/macro_setSpeed.py`: Sends temporary speed macro commands to the robot for a run.
+- `macro/macro_logger.py`: Logs converted runtime data in `t, x, y, yaw, v_x` format.
+- `macro/plot_robot_csv.py`: Transforms logged data and generates plots plus KPI-ready CSV outputs.
 
----
+Example output plot:
 
-## Iterations Summary
+![Macro logging plot](macro/all_plots_combined.png)
 
+#### Default Omron configuration notes
 
+- Macro speed changes are temporary and apply only for the active test run.
+- During acquisition, multiple speed settings were evaluated (for example, `100 mm/s` straight-line motion).
 
+Reference images:
 
-| Iteration | Isaac Max linear speed | Isaac Max ang speed | **ROS max_vel_x** | **ROS max_acc** | J_tilde | RMSE_pos [m] | RMSE_psi [rad] | Time Window |
-| --------- | ---------------------- | ------------------- | ----------------- | --------------- | ------- | ------------ | -------------- | ----------- |
-| 1         | 1.2                    | 1.0472              | (no effect)       | (no effect)     | 45.53   | 2.69         | 0.02463        | 0–4.80 s    |
-| 2         | 1.2                    | 1.0472              | (no effect)       | (no effect)     | 13.83   | 2.69         | 0.02463        | 0–4.80 s    |
-| 3         | 0.5                    | 1.0472              | (no effect)       | (no effect)     | 7.07    | 1.33         | 0.02893        | 0–10.10 s   |
-| 4         | 0.5                    | 1.0472              | (no effect)       | (no effect)     | 6.63    | 1.26         | 0.02069        | 0–11.20 s   |
-| **5**     |**0.0**                 | **0.0000**          | **0.2**           | **0.2**         | **6.13**| **1.18**     | **0.01487**    |**0–14.20 s**|
-| 6         | 0.0                    | 0.0000              | 0.4               | 0.2             | 2.5     | 0.43         | 0.02258        | 0–12.20 s   |
-| 7         | 0.0                    | 0.0000              | 0.4               | 0.1             | 1.1     | 0.18         | 0.01160        | 0-14.20     |
+![Macro speed values](macro/macrovalues.png)
+![Robot configuration](macro/robot_config.png)
 
+### Step 3: Full End-to-End Run
 
-> ***ROS parameters had no influence during Iterations 1–4 as Isaac Sim caps dominated the motion.***
+1. Log real robot data to `real_log_for_kpi.csv`.
+2. Convert and preprocess simulation data to `sim_log_for_kpi.csv`.
+3. Run KPI computation.
 
-## Conclusion
+## Running `compute_kpis.py`
 
-This process outlines the necessary steps to align the simulated robot with the real robot. By adjusting the simulation parameters and comparing the RMSE values, we can achieve better alignment, which is essential for accurate testing and evaluation in simulation environments. Future improvements will include refining control parameters and further reducing the discrepancies in the simulated robot’s trajectory.
+Input:
 
+- Two CSV files in `t,x,y,yaw` format (`real` and `sim`).
 
+Preprocessing inside KPI workflow:
 
-## Manual check
-J value is 6.63654
-[overlap] t ∈ [0.00, 11.20] s
-sim Δx=4.857, Δy=0.001, Δyaw=0.033
-real Δx=4.232, Δy=0.005, Δyaw=0.000
-Samples: 113 @ ~10.0 Hz
-RMSE_pos  [m]  = 1.26803
-RMSE_psi  [rad] = 0.02069  [deg] = 1.18530
+- Normalize both trajectories to the same start pose and initial yaw.
+- Resample both signals to `10 Hz` over overlapping time range.
+
+KPI outputs:
+
+- `RMSE_pos`
+- `RMSE_psi`
+- `J_tilde`
+
+Command:
+
+```bash
+python compute_kpis.py --real real_log_for_kpi.csv --sim sim_log_for_kpi.csv
+```
+
+## Tolerance Selection Based on Omron LD250 Datasheet
+
+### Problem
+
+`J_tilde` was initially high due to strict default thresholds and large position deviation between real and simulated trajectories.
+
+### Thresholds
+
+- Initial:
+  - `T_pos = 0.03 m`
+  - `T_psi = 0.02 rad` (about 1.15 deg)
+
+- LD250-based:
+  - `T_pos = 0.1 m`
+  - `T_psi = 0.0349 rad` (2 deg)
+
+### Results
+
+Before LD250 thresholds:
+
+```text
+RMSE_pos [m]   = 1.08025
+RMSE_psi [rad] = 0.02637   [deg] = 1.51065
+J_tilde        = 18.66327
+```
+
+After LD250 thresholds:
+
+```text
+RMSE_pos [m]   = 1.08025
+RMSE_psi [rad] = 0.02637   [deg] = 1.51065
+J_tilde        = 5.77897
+```
+
+Interpretation:
+
+- RMSE values stay the same.
+- `J_tilde` drops due to more realistic normalization thresholds.
+
+## Pilot KPI Evaluation
+
+| Metric | Description | Value | Interpretation |
+|---|---|---|---|
+| Overlap | Common time window between trajectories | `0.00-9.90 s` | 10 s of overlap used |
+| Sim `Dx, Dy` [m] | Net displacement (sim) | `2.937, -0.018` | Sim moved about 3 m forward |
+| Real `Dx, Dy` [m] | Net displacement (real) | `0.921, -0.012` | Real moved about 1 m forward |
+| Samples | Synchronized samples at about 10 Hz | `100` | Sufficient for KPI computation |
+| `RMSE_pos [m]` | Position RMSE | `2.018` | Large spatial mismatch |
+| `RMSE_psi [rad]` | Yaw RMSE | `0.0175` (about 1.0 deg) | Good heading agreement |
+| `J_tilde` | Combined normalized KPI | `10.34` | Fails pass threshold |
+
+Summary:
+
+- Orientation agreement is acceptable.
+- Main gap is forward displacement mismatch (sim travels farther than real).
+
+## Finding: Effect of Differential Controller Caps
+
+Purpose:
+
+- Evaluate the influence of Isaac Sim Differential Controller Node caps on stability, stopping response, and controllability.
+
+### Observed Configurations
+
+1. With caps:
+- `maxLinearSpeed = 1.2 m/s`
+- `maxAngularSpeed = 1.047 rad/s`
+- Stable and predictable behavior.
+
+2. Caps removed (`0` values):
+- Loss of control, especially in angular behavior.
+
+3. Caps removed + damping sweep (`1e-9` to `1e-4`):
+- Partial improvement, but still inconsistent control and delayed stopping.
+
+4. Caps restored:
+- Stability recovered.
+
+### Key Observation Table
+
+| Configuration | Behavior | Control Response | Stability |
+|---|---|---|---|
+| With caps | Predictable | Immediate stop response | High |
+| No caps | Erratic | Delayed stopping | Poor |
+| No caps + adjusted damping | Improved but inconsistent | Inconsistent | Medium-low |
+
+![Comparison of capped vs uncapped differential controller behavior](images/before_after_cap_remove.png)
+
+Note:
+
+- Early iterations indicated caps strongly dominated motion behavior.
+- Later iterations (after control-path fixes and ROS parameter tuning) demonstrated that removing caps can still yield controllable behavior, with ROS parameters effectively influencing dynamics.
+
+## Sim2Real Alignment Process
+
+### Objective
+
+- Match simulated and real trajectories in position (`x`, `y`) and orientation (`yaw`).
+- Reduce KPI errors and move toward `J_tilde <= 1`.
+
+### Method
+
+1. Normalize both datasets into a common reference frame.
+2. Resample and compute RMSE/KPI metrics.
+3. Tune Isaac and ROS parameters iteratively.
+4. Compare overlap plots and aggregate KPI metrics.
+
+### Visualizations
+
+Before parameter adjustment:
+
+![Before](images/itr_2_5m/overlap_plot_before.png)
+
+After parameter adjustment:
+
+![After](images/itr_2_5m/overlap_plot_after.png)
+
+## Iteration Summary
+
+| Iteration | Isaac Max linear speed | Isaac Max ang speed | ROS `max_vel_x` | ROS `max_acc` | `J_tilde` | `RMSE_pos [m]` | `RMSE_psi [rad]` | Time Window |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| 1 | 1.2 | 1.0472 | no effect | no effect | 45.53 | 2.69 | 0.02463 | 0-4.80 s |
+| 2 | 1.2 | 1.0472 | no effect | no effect | 13.83 | 2.69 | 0.02463 | 0-4.80 s |
+| 3 | 0.5 | 1.0472 | no effect | no effect | 7.07 | 1.33 | 0.02893 | 0-10.10 s |
+| 4 | 0.5 | 1.0472 | no effect | no effect | 6.63 | 1.26 | 0.02069 | 0-11.20 s |
+| 5 | 0.0 | 0.0000 | 0.2 | 0.2 | 6.13 | 1.18 | 0.01487 | 0-14.20 s |
+| 6 | 0.0 | 0.0000 | 0.4 | 0.2 | 2.50 | 0.43 | 0.02258 | 0-12.20 s |
+| 7 | 0.0 | 0.0000 | 0.4 | 0.1 | 1.10 | 0.18 | 0.01160 | 0-14.20 s |
+
+Observation:
+
+- During iterations 1-4, ROS parameters had limited effect because Isaac caps dominated the motion envelope.
+
+## Detailed Iterations (5-7)
+
+### Manual check snapshot
+
+```text
+J value = 6.63654
+[overlap] t in [0.00, 11.20] s
+sim Dx=4.857, Dy=0.001, Dyaw=0.033
+real Dx=4.232, Dy=0.005, Dyaw=0.000
+Samples: 113 @ about 10.0 Hz
+RMSE_pos [m] = 1.26803
+RMSE_psi [rad] = 0.02069   [deg] = 1.18530
+```
+
+Runtime parameter set:
 
 ```bash
 # Controller Server
@@ -313,69 +317,62 @@ ros2 param set /velocity_smoother max_accel '[2.0, 0.0, 3.2]'
 ros2 param set /velocity_smoother max_decel '[-2.0, 0.0, -3.2]'
 ```
 
----
+### Iteration 5: Remove DCN cap values
 
-## Iteration 5 — Removing DCN Cap Values
+- Inputs:
+  - Velocity: `0.2 m/s`
+  - Acceleration: `0.4 m/s^2`
+- Result:
+  - Command velocity and odometry became more consistent.
+  - ROS parameters began to shape motion behavior directly.
 
-After removing DCN caps, input command velocities match odom output more closely.
+![DCN cap values removed](images/itr_3_5m_without_DCN_cap/After.png)
+![Overlap iteration 5](images/itr_3_5m_without_DCN_cap/overlap.png)
 
-Before / After image:
-> After
-![DCN cap vals removed](images/itr_3_5m_without_DCN_cap/After.png)
+### Iteration 6: Increase ROS velocity toward real robot profile
 
-Overlap plot (iteration 5) — ROS params now influence behavior:
-![overlap iteration 5](images/itr_3_5m_without_DCN_cap/overlap.png)
+- Goal:
+  - Move closer to observed real velocity (about `0.6 m/s`).
+- Result:
+  - Better overlap with real trajectory.
 
-Notes:
-- Input velocity = 0.2 m/s
-- Input acceleration = 0.4 m/s²
+![Iteration 6 ROS settings](images/itr_4_5m_without_DCN_cap/ros_set.png)
+![Iteration 6 overlap](images/itr_4_5m_without_DCN_cap/overlap.png)
 
-This iteration demonstrates the effect of removing DCN caps so that only ROS 2 controller parameters shape robot motion. 
+### Iteration 7: Reduce acceleration by 50%
 
-> With that the earlier assumption is no longer valid i.e to maintain the DCN cap vals
- 
+- Inputs:
+  - Velocity: `0.4 m/s`
+  - Acceleration: `0.1 m/s^2`
+- Overlap window:
+  - `t in [0.00, 14.20] s`
 
-## Iteration 6 — Increasing ROS Velocity to Match Real Robot
+Results:
 
-After validating that removing DCN cap values allowed ROS 2 controller parameters to take full effect, the linear velocity and acceleration limits were increased to better match the real robot’s observed velocity (~0.6 m/s).
+- Sim: `Dx = 5.224 m`, `Dy = 0.014 m`, `Dyaw = 0.001 rad`
+- Real: `Dx = 5.073 m`, `Dy = 0.006 m`, `Dyaw = 0.000 rad`
+- Samples: `143` at about `10.0 Hz`
+- `RMSE_pos = 0.18846 m`
+- `RMSE_psi = 0.01160 rad` (about 0.6646 deg)
+- `J_tilde = 1.10846`
 
-![](images/itr_4_5m_without_DCN_cap/ros_set.png)
+Discussion:
 
-Overlap plot (iteration 6) — improved alignment with real robot trajectory:
-![](images/itr_4_5m_without_DCN_cap/overlap.png)
+- Lower acceleration increased maneuver time but improved trajectory matching.
+- This iteration approached the pass criterion (`J_tilde <= 1.0`).
 
+![Iteration 7 ROS settings](images/itr_5_5m_without_DCN_cap/ros_set.png)
+![Iteration 7 overlap](images/itr_5_5m_without_DCN_cap/overlap.png)
 
+### J progression plot
 
-
-
-## Iteration 7
-
-In this iteration we reduced the acceleration by 50% while keeping the linear velocity unchanged.
-
-Notes:
-- Input velocity: 0.4 m/s
-- Input acceleration: 0.1 m/s²
-
-![](images/itr_5_5m_without_DCN_cap/ros_set.png)
-
-Overlap plot — improved alignment with the real robot trajectory:
-![](images/itr_5_5m_without_DCN_cap/overlap.png)
-
-Overlap window: t ∈ [0.00, 14.20] s
-
-Simulation results (overlap window):
-- sim Δx = 5.224 m, Δy = 0.014 m, Δyaw = 0.001 rad
-- real Δx = 5.073 m, Δy = 0.006 m, Δyaw = 0.000 rad
-- Samples: 143 @ ~10.0 Hz
-
-KPIs:
-- RMSE_pos [m] = 0.18846
-- RMSE_psi [rad] = 0.01160 (≈ 0.6646°)
-- J_tilde = 1.10846 (note: J_tilde ≤ 1.0 meets the pass threshold)
-
-Discussion
-:
-Reducing acceleration while keeping the same cruise velocity increased the duration of the maneuver (overlap time = 14.20 s). The overlap plot shows this effect. Importantly, this iteration demonstrates that, after removing DCN caps, ROS controller parameters (velocity and acceleration limits) influence simulated motion. By tuning these ROS parameters — manually or automatically — the simulated robot's behavior can be brought closer to the real robot's trajectory.
-
-### J-plot:
 ![J plot](images/J_plot.png)
+
+## Conclusion
+
+The Sim2Real workflow is now documented in a reproducible and quantitative way. Key outcomes:
+
+- A stable data pipeline for real and simulated trajectory comparison.
+- KPI computation methodology based on synchronized and normalized trajectories.
+- Significant reduction in trajectory mismatch through iterative parameter tuning.
+- Final tuning stage achieved `J_tilde` close to the pass threshold, indicating strong progress toward robust Sim2Real alignment.

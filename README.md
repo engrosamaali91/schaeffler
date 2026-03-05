@@ -376,6 +376,8 @@ BO overlap and surface:
 - **Laser frame moving incorrectly with robot**
   - Confirm LiDAR `frame_id` matches the actual xform where LiDAR is mounted.
 
+- Known issues and resolutions: [issues/issues.md](issues/issues.md)
+
 ## Documentation Index
 
 - Isaac Sim configuration and action graph details: [Isaac Sim Configuration](#isaac-sim-configuration)

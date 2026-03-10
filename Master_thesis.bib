@@ -7,14 +7,14 @@
 
     A digital twin of the LD250 is imported into Isaac Sim and evaluated under matched real and simulated
     tasks. Real-robot odometry is acquired via MQTT and compared against simulated odometry using
-    a trajectory-level KPI, $\tilde{J}$, defined as a weighted combination of position and yaw RMSE after time
+    a trajectory-level KPI {\~{J}}, defined as a weighted combination of position and yaw RMSE after time
     alignment and frame normalization. Bayesian Optimization is used to tune a small set of high-impact
-    Nav2 hyperparameters, iteratively minimizing $\tilde{J}$ in a fully automated, headless evaluation loop.
+    Nav2 hyperparameters, iteratively minimizing ˜J in a fully automated, headless evaluation loop.
 
     Results show that the optimizer substantially reduces the Sim2Real discrepancy. In a straight-run
-    scenario, $\tilde{J}$ is reduced from 4.899 (worst observed during exploration) to 0.567 (best), corresponding
+    scenario, ˜J is reduced from 4.899 (worst observed during exploration) to 0.567 (best), corresponding
     to an 88.4% KPI reduction and strong trajectory overlap. In a static obstacle avoidance scenario, the
-    best configuration reduces $\tilde{J}$ from 18.815 (worst observed) to 2.517, corresponding to an 86.6% KPI
+    best configuration reduces ˜J from 18.815 (worst observed) to 2.517, corresponding to an 86.6% KPI
     reduction, indicating significant improvement but also revealing a remaining discrepancy in the static
     obstacle avoidance scenario. The best configurations were found by iteration 6 in both scenarios, with
     additional evaluations performed for verification. These findings demonstrate that KPI-driven parameter

@@ -1,14 +1,15 @@
 # Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Nav2 Parameter Optimization](#nav2-parameter-optimization)
-- [Overview](#overview)
-- [Bayesian Optimization Pipeline (Scenario 1 & 2)](#bayesian-optimization-pipeline-scenario-1--2)
-- [Scenario Differences (S1 vs S2)](#scenario-differences-s1-vs-s2)
-- [Parameter Initialization](#parameter-initialization)
-- [Search Space (pbounds)](#search-space-pbounds)
-- [Optimization Loop](#optimization-loop)
-- [In Summary — Key Motion Parameters](#in-summary--key-motion-parameters)
-- [Concept](#concept)
+	- [Overview](#overview)
+	- [Bayesian Optimization Pipeline (Scenario 1 \& 2)](#bayesian-optimization-pipeline-scenario-1--2)
+	- [Scenario Differences (S1 vs S2)](#scenario-differences-s1-vs-s2)
+	- [Parameter Initialization](#parameter-initialization)
+	- [Search Space (pbounds)](#search-space-pbounds)
+	- [Optimization Loop](#optimization-loop)
+	- [In Summary — Key Motion Parameters](#in-summary--key-motion-parameters)
+	- [Concept](#concept)
 
 # Nav2 Parameter Optimization
 

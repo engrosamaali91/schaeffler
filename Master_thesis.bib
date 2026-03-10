@@ -1,0 +1,34 @@
+@mastersthesis{2026Ashraf,
+   abstract = {High-fidelity simulation is increasingly used to validate autonomous mobile robot (AMR) use cases
+    safely and cost-effectively. However, bridging the Sim2Real gap remains challenging in industrial settings,
+    especially for proprietary platforms that are not ROS-native and therefore do not expose low-level
+    navigation internals. This thesis targets an Omron LD250 AGV and proposes an automated Sim2Real
+    reduction pipeline in NVIDIA Omniverse Isaac Sim.
+
+    A digital twin of the LD250 is imported into Isaac Sim and evaluated under matched real and simulated
+    tasks. Real-robot odometry is acquired via MQTT and compared against simulated odometry using
+    a trajectory-level KPI, $\tilde{J}$, defined as a weighted combination of position and yaw RMSE after time
+    alignment and frame normalization. Bayesian Optimization is used to tune a small set of high-impact
+    Nav2 hyperparameters, iteratively minimizing $\tilde{J}$ in a fully automated, headless evaluation loop.
+
+    Results show that the optimizer substantially reduces the Sim2Real discrepancy. In a straight-run
+    scenario, $\tilde{J}$ is reduced from 4.899 (worst observed during exploration) to 0.567 (best), corresponding
+    to an 88.4% KPI reduction and strong trajectory overlap. In a static obstacle avoidance scenario, the
+    best configuration reduces $\tilde{J}$ from 18.815 (worst observed) to 2.517, corresponding to an 86.6% KPI
+    reduction, indicating significant improvement but also revealing a remaining discrepancy in the static
+    obstacle avoidance scenario. The best configurations were found by iteration 6 in both scenarios, with
+    additional evaluations performed for verification. These findings demonstrate that KPI-driven parameter
+    tuning can improve digital-twin fidelity under realistic industrial constraints, enabling safer and faster
+    validation of intralogistics use cases. Future work will extend environment realism (e.g., 3D meshes/point
+    clouds) and improve real–sim interfacing for broader scenario coverage.
+    },
+   author = {Ashraf, Osama Ali},
+   title = {Development of a Methodology for Parameter Optimization of a Simulated Mobile      Robot to Minimize the Sim2Real Gap},
+   school = {Hochschule Bonn-Rhein-Sieg},
+   address = {Grantham-Allee 20, 53757 St. Augustin, Germany},
+   month = {March},
+   year = {2026},
+   note = {[Semester you started the MAS Program] [Project Affiliation] - [Project Name]
+           [Last name of 1st Supervisor], [Last name of 2nd supervisor],
+           [last name of third supervisor (if applicable)] supervising}
+}

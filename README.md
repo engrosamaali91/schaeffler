@@ -1,9 +1,17 @@
+- [Navigation Stack with Gazebo classic](#navigation-stack-with-gazebo-classic)
 - [Required Installations](#required-installations)
 - [Create Package](#create-package)
 - [Gazebo](#gazebo)
 - [Launch rsp, spawn robot and gazebo launch file together](#launch-rsp-spawn-robot-and-gazebo-launch-file-together)
 - [Gazebo Lidar](#gazebo-lidar)
 - [Gazebo camera](#gazebo-camera)
+- [Ros2 control](#ros2-control)
+- [SLAM with ROS using slam\_toolbox](#slam-with-ros-using-slam_toolbox)
+- [Lcalization using AMCL](#lcalization-using-amcl)
+- [Run AMCL](#run-amcl)
+- [Nav2 stack](#nav2-stack)
+    - [RQT TF TREE](#rqt-tf-tree)
+- [Adding launch files locally](#adding-launch-files-locally)
 - [Important ROS2 Commands](#important-ros2-commands)
 
 # Navigation Stack with Gazebo classic
@@ -304,4 +312,22 @@ ros2 run rqt_tf_tree rqt_tf_tree
 or using tf2 tool but this would save pdf in home directory
 ```
 ros2 run tf2_tools view_frames 
+```
+
+Step 1:
+
+Launch gazebo
+```bash
+ros2 launch emma_visualization launch_sim.launch.py world:=./src/emma_visualization/worlds/powerplant.world
+```
+
+Launch localization package 
+
+```bash
+ros2 launch emma_visualization localization_launch.py use_sim_time:=true map:=./maps/my_map_save.yaml
+```
+
+Launch Navigation package 
+```bash
+ros2 launch emma_visualization navigation_launch.py use_sim_time:=true
 ```

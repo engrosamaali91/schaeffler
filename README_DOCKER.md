@@ -1,9 +1,9 @@
 # NVIDIA Isaac Sim Docker Setup Guide
 
-## Table of Contents
+## Table of Contents:
 
 - [NVIDIA Isaac Sim Docker Setup Guide](#nvidia-isaac-sim-docker-setup-guide)
-  - [Table of Contents](#table-of-contents)
+  - [Table of Contents:](#table-of-contents)
   - [Overview](#overview)
   - [Installation](#installation)
     - [Docker Installation](#docker-installation)

@@ -147,6 +147,11 @@ docker run --name isaac-sim \
   nvcr.io/nvidia/isaac-sim:5.1.0
 ```
 
+Optional: Mount the usd to docker container  
+```
+-v ~/Downloads/omron_emma/change_omron_support_wheels:/workspace/emma:rw
+```
+
 ### Running with GUI
 
 To launch Isaac Sim with the graphical user interface:

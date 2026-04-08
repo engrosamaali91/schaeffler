@@ -1,16 +1,47 @@
+# Use the official ROS 2 Humble image as the base image
 FROM osrf/ros:humble-desktop-full
 
-# Install ros packages
+# Install necessary system dependencies
 RUN apt-get update && apt-get install -y \
         nano \
-        build-essential && \
-    rm -rf /var/lib/apt/lists/*  
+        vim \
+        build-essential \
+        git \
+        curl \
+        wget && \
+    rm -rf /var/lib/apt/lists/*
 
+# Install ROS 2 Humble packages for Navigation stack and Localization
+RUN apt-get update && apt-get install -y \
+        ros-humble-navigation2 \
+        ros-humble-nav2-bringup \
+        ros-humble-turtlebot3-msgs \
+        ros-humble-turtlebot3 \
+        ros-humble-slam-toolbox \
+        ros-humble-twist-mux \
+        ros-humble-image-transport-plugins \
+        ros-humble-rqt-image-view \
+        ros-humble-cartographer \
+        ros-humble-cartographer-ros \
+        ros-humble-joint-state-publisher \
+        ros-humble-joint-state-publisher-gui \
+        ros-humble-xacro \
+        ros-humble-teleop-twist-keyboard && \
+    rm -rf /var/lib/apt/lists/*
 
 # Create a ros2 workspace
-WORKDIR /emma_ws
+WORKDIR /gzemma_ws
 
-# launch ros package 
-# CMD ["ros2", "launch", "demo_nodes_cpp", "talker_listener.launch.py"]
+# Copy the package source code to the workspace
+COPY ./src/ ./src
 
-# CMD [ "ros2", "launch", "gazebo_ros", "gazebo.launch.py"]
+# Copy maps directory
+COPY ./maps/ ./maps
+
+# Source the ros2 environment
+SHELL ["/bin/bash", "-c"]
+
+# Build the workspace
+RUN source /opt/ros/humble/setup.bash && \
+    colcon build --symlink-install
+

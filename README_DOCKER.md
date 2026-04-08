@@ -202,3 +202,19 @@ Optionally we can run the container with the desired domain id for example:
  ```bash
 docker run -it --rm --network host -e ROS_DOMAIN_ID=51 ros:humble bash
 ```
+
+
+
+
+--------------------------------------------
+ROS2 PACKAGES DEPLOYMENT ON DOCKER CONTAINER
+
+The package is moved to emma_ws inside container
+```bash
+docker run -it --rm --network host \
+            --ipc host \
+            -e DISPLAY=$DISPLAY \
+            -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+            emma_in_gazebo:latest bash
+```
+

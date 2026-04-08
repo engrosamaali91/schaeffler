@@ -196,3 +196,9 @@ export ROS_DOMAIN_ID=0
 ```
 
 If the container and host use different domain IDs, ROS 2 nodes may not discover each other and topics may not be visible across environments.
+
+Optionally we can run the container with the desired domain id for example:
+
+ ```bash
+docker run -it --rm --network host -e ROS_DOMAIN_ID=51 ros:humble bash
+```

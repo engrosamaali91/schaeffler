@@ -18,6 +18,7 @@
     - [System Compatibility Check](#system-compatibility-check)
   - [Important Notes](#important-notes)
     - [ROS 2 Domain ID Configuration](#ros-2-domain-id-configuration)
+- [Docker](#docker)
 
 ---
 
@@ -204,9 +205,8 @@ docker run -it --rm --network host -e ROS_DOMAIN_ID=51 ros:humble bash
 ```
 
 
-
-
 --------------------------------------------
+# Docker
 ROS2 PACKAGES DEPLOYMENT ON DOCKER CONTAINER
 
 The package is moved to emma_ws inside container

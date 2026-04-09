@@ -15,14 +15,9 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get update && apt-get install -y \
         ros-humble-navigation2 \
         ros-humble-nav2-bringup \
-        ros-humble-turtlebot3-msgs \
-        ros-humble-turtlebot3 \
-        ros-humble-slam-toolbox \
         ros-humble-twist-mux \
         ros-humble-image-transport-plugins \
         ros-humble-rqt-image-view \
-        ros-humble-cartographer \
-        ros-humble-cartographer-ros \
         ros-humble-joint-state-publisher \
         ros-humble-joint-state-publisher-gui \
         ros-humble-xacro \
@@ -44,4 +39,3 @@ SHELL ["/bin/bash", "-c"]
 # Build the workspace
 RUN source /opt/ros/humble/setup.bash && \
     colcon build --symlink-install
-

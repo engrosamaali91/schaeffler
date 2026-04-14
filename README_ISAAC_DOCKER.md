@@ -17,9 +17,6 @@
     - [Running with GUI](#running-with-gui)
     - [System Compatibility Check](#system-compatibility-check)
   - [Important Notes](#important-notes)
-    - [ROS 2 Domain ID Configuration](#ros-2-domain-id-configuration)
-- [Docker](#docker)
-
 ---
 
 ## Overview
@@ -178,43 +175,4 @@ Verify that your system meets Isaac Sim requirements:
 > 
 > - The application experience may not be as expected. For a full GUI app experience please run Isaac Sim with the [Workstation Installation](https://docs.isaacsim.omniverse.nvidia.com/latest/installation/install_workstation.html).
 > - X11 forwarding limitations and GPU rendering constraints may impact performance and visual quality.
-
-### ROS 2 Domain ID Configuration
-
-> [!IMPORTANT]
-> To ensure ROS 2 topic discovery between the container and the host machine, use the same `ROS_DOMAIN_ID` on both environments.
-
-Check your current domain ID:
-
-```bash
-echo $ROS_DOMAIN_ID
-```
-
-If the value is not `0`, set it to `0` (default):
-
-```bash
-export ROS_DOMAIN_ID=0
-```
-
-If the container and host use different domain IDs, ROS 2 nodes may not discover each other and topics may not be visible across environments.
-
-Optionally we can run the container with the desired domain id for example:
-
- ```bash
-docker run -it --rm --network host -e ROS_DOMAIN_ID=51 ros:humble bash
-```
-
-
---------------------------------------------
-# Docker
-ROS2 PACKAGES DEPLOYMENT ON DOCKER CONTAINER
-
-The package is moved to emma_ws inside container
-```bash
-docker run -it --rm --network host \
-            --ipc host \
-            -e DISPLAY=$DISPLAY \
-            -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-            emma_in_gazebo:latest bash
-```
 

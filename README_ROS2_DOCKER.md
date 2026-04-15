@@ -15,7 +15,9 @@
 
 ### Docker
 > [!NOTE]
-> Refer to [README_ISAAC_DOCKER.md](README_ISAAC_DOCKER.md#installation) for Docker and NVIDIA Container Toolkit setup.
+> Refer to [README_ISAAC_DOCKER.md](README_ISAAC_DOCKER.md#installation) for Docker Installation 
+>
+> Refer to [ROS2 Humble](https://docs.ros.org/en/humble/Installation.html) for ros2 installation 
 
 ### Workstation ROS 2 & Packages
 

@@ -36,7 +36,5 @@ COPY ./src/navigation ./src/navigation
 COPY ./src/nav_bringup ./src/nav_bringup
 
 # Build the workspace
-RUN /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install"
-
-# Set entry point for container
-ENTRYPOINT ["/bin/bash"]
+RUN /bin/bash -c "source /opt/ros/humble/setup.bash && \
+                  colcon build --symlink-install"

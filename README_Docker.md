@@ -56,7 +56,13 @@ docker image ls | grep emma_in_isaacsim
 
 ---
 
+
 ## Run Container
+#### Run Isaac sim on host host machine before running the container   
+- run isaac sim 
+- load emma usd file
+- click play
+
 
 ### Start Container with X11 Forwarding
 

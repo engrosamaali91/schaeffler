@@ -50,6 +50,7 @@ src/nav_bringup/
   - Main launch entry point.
   - Handles top-level arguments (for example `map`, `slam`, `use_sim_time`, `params_file`).
   - Includes the localization and navigation launch files.
+  - Launches RViz2 by default so you do not need a second terminal.
 
 - **`localization_launch.py`**
   - Starts localization components (typically AMCL and map server) when running in map-based mode.
@@ -104,6 +105,8 @@ Common arguments used with `bringup_launch.py`:
 - `slam`: Toggle SLAM mode (`true`) vs map-based localization (`false`).
 - `map`: Path to map YAML (used in localization mode).
 - `params_file`: Path to Nav2 parameter file (for example custom tuned YAML).
+- `rviz`: Whether to launch RViz2 automatically (`true`/`false`).
+- `rviz_config`: Path to the RViz config file.
 
 To inspect all available arguments:
 
@@ -117,6 +120,7 @@ ros2 launch nav_bringup bringup_launch.py --show-args
 - Ensure frame IDs in Nav2 parameters match frames published by Isaac Sim.
 - Keep `use_sim_time:=true` for simulation-based workflows.
 - Use `bringup_launch.py` as the standard entry point; avoid launching localization/navigation independently unless debugging.
+- If you do not want RViz on startup, pass `rviz:=false`.
 
 ## Troubleshooting
 

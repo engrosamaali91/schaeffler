@@ -331,8 +331,4 @@ docker ps
 
 ## Additional Resources
 
-- [ROS 2 Humble Documentation](https://docs.ros.org/en/humble/)
-- [Nav2 Documentation](https://navigation.ros.org/)
-- [Isaac Sim ROS 2 Integration](https://docs.omniverse.nvidia.com/isaacsim/latest/)
-- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
-
+- [Map Creation & Preparation Guide](map.md) — Learn how to create and clean occupancy maps for the Autonomous Production Hub environment

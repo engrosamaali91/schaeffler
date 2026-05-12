@@ -53,6 +53,8 @@ git checkout isaac_sim
 
 ## Build Docker Image
 
+### Option A: Build Locally
+
 ### Step 1: Build the Image
 ```bash
 docker build -t emma_in_autonomousproductionhub:latest .
@@ -64,6 +66,21 @@ docker image ls | grep emma_in_autonomousproductionhub
 ```
 
 Expected output: Image ID, creation date, and size.
+
+---
+
+### Option B: Pull from Docker Hub (Quick Start)
+
+Skip the build process and pull the pre-built image directly:
+
+```bash
+docker pull osamaali91/emma_in_isaacsim:autonomousproductionhub-v2.0.0
+```
+
+Verify:
+```bash
+docker image ls | grep emma_in_isaacsim
+```
 
 ---
 
@@ -131,6 +148,22 @@ docker run -it --rm \
   -e RMW_IMPLEMENTATION=rmw_cyclonedds_cpp \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
   emma_in_autonomousproductionhub:latest \
+  bash
+```
+
+**Or if using Docker Hub image:**
+```bash
+docker run -it --rm \
+  --name emma_ros2 \
+  --network host \
+  --ipc host \
+  --pid host \
+  -e DISPLAY=$DISPLAY \
+  -e ROS_DOMAIN_ID=0 \
+  -e ROS_LOCALHOST_ONLY=0 \
+  -e RMW_IMPLEMENTATION=rmw_cyclonedds_cpp \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  osamaali91/emma_in_isaacsim:autonomousproductionhub-v2.0.0 \
   bash
 ```
 
